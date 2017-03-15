@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
-        id="org.apache.cordova.device" version="0.2.3">
+        id="com.webfit.nativemap" version="0.0.1">
     <name>Native map</name>
-    <description>Cordova Device Plugin</description>
+    <description>Cordova native map plugin</description>
     <license>Apache 2.0</license>
     <keywords>cordova,nativemap,map,osm</keywords>
     <js-module src="www/nativemap.js" name="nativemap">
