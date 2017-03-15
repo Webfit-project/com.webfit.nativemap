@@ -1,25 +1,17 @@
-cordova.define('com.webfit.nativemap', function(require, exports, module) {
-    
-    var exec = require('cordova/exec');
+//cordova.define('com.webfit.nativemap.nativemap', function(require, exports, module) {
 
-    var nativemap = function() {   };
+var exec = require('cordova/exec');
 
-    nativemap.prototype.startMap = function(successCallback, failureCallback) {
-        
-    	exec(successCallback, failureCallback, 'nativemap', 'startListen', []);
-    };
-	
+var nativemap = {
 
-    
-	if(!window.plugins) {
-    window.plugins = {};
+    startMap : function(successCallback, failureCallback) {
+
+        exec(successCallback, failureCallback, 'nativemap', 'startListen', []);
+    }
 }
-    
- 
-if (!window.plugins.nativemap) {
-    window.plugins.nativemap = new nativemap();
-}
- module.exports = nativemap;
-	//cordova.define("cordova/plugin/gpsDetectionPlugin", gpsDetect);
-	
-});
+
+
+module.exports = nativemap;
+//cordova.define("cordova/plugin/gpsDetectionPlugin", gpsDetect);
+
+//});
