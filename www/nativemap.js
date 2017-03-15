@@ -15,7 +15,7 @@ if (typeof cordova !== 'undefined') {
 }
 else
 {
-var nativemap = {
+    var nativemap = {
 
         startMap : function(successCallback, failureCallback) {
 
@@ -25,7 +25,7 @@ var nativemap = {
 
 
     module.exports = nativemap;
-}
+
 }
 //cordova.define("cordova/plugin/gpsDetectionPlugin", gpsDetect);
 
