@@ -6,36 +6,46 @@ import org.apache.cordova.PluginResult.Status;
 import org.json.JSONArray;
 
 
-
-
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
-import android.location.LocationManager;
-import android.provider.Settings;
-import android.support.v4.view.MotionEventCompat;
-import android.view.MotionEvent;
-import android.view.View;
+
+import android.preference.PreferenceManager;
+import android.util.Log;
+
+import com.google.android.gms.phenotype.Configuration;
+import com.ionicframework.camptocamp893008.R;
+
+import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
+import org.osmdroid.views.MapView;
 
 public class nativemap extends CordovaPlugin {
-    
+
     CallbackContext cbContext;
 
 
-public boolean execute(String action, final JSONArray args, CallbackContext callbackContext) {
+    public boolean execute(String action, final JSONArray args, CallbackContext callbackContext) {
+        final CordovaPlugin that = this;
+        this.cbContext = callbackContext;
 
-		this.cbContext = callbackContext;
-
-		PluginResult result = new PluginResult(PluginResult.Status.NO_RESULT);;
-    	result.setKeepCallback(true);
-
-        if (action.equals("test")) {
-
-        }
-        else if(action.equals("startMap"))
+        PluginResult result = new PluginResult(PluginResult.Status.NO_RESULT);;
+        result.setKeepCallback(true);
+        Log.d("STATE","on est dans execute " + action);
+       if(action.equals("startMap"))
         {
-        	callbackContext.sendPluginResult(result);
-        	
+            Log.d("STATE","onstart la map");
+
+            cordova.getThreadPool().execute(new Runnable() {
+                public void run() {
+
+                    Intent intentMap = new Intent(that.cordova.getActivity().getBaseContext(), MapActivity.class);
+                    intentMap.setPackage(that.cordova.getActivity().getApplicationContext().getPackageName());
+
+                    that.cordova.startActivityForResult(that, intentMap, 0);
+                }
+            });
+
+            callbackContext.sendPluginResult(result);
+
         }
         else {
             result = new PluginResult(Status.INVALID_ACTION);
@@ -51,12 +61,11 @@ public boolean execute(String action, final JSONArray args, CallbackContext call
 
 
 
-	public void startMap() {
+    public void startMap() {
 
 
-		
+
 
     }
-
 
 }

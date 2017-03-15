@@ -6,7 +6,7 @@
 
         startMap : function(successCallback, failureCallback) {
 
-            exec(successCallback, failureCallback, 'nativemap', 'startListen', []);
+            exec(successCallback, failureCallback, 'nativemap', 'startMap', []);
         }
     }
 

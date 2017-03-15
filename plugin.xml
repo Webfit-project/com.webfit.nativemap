@@ -9,12 +9,17 @@
         <clobbers target="nativemap" />
     </js-module>
     <platform name="android">
+        <framework src="src/android/rules.gradle" custom="true" type="gradleReference" />
         <config-file target="config.xml" parent="/*">
             <feature name="nativemap" >
                 <param name="android-package" value="com.webfit.nativemap"/>
             </feature>
         </config-file>
         <source-file src="src/android/nativemap.java" target-dir="src/com/webfit/nativemap" />
+
+        <config-file target="AndroidManifest.xml" parent="/manifest/application">
+            <activity android:name="com.webfit.nativemap.MapActivity" android:label="Share"/>
+        </config-file>
     </platform>
     <!--
     <platform name="ios">
