@@ -6,6 +6,7 @@ import org.apache.cordova.PluginResult.Status;
 import org.json.JSONArray;
 
 
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 
@@ -15,57 +16,76 @@ import android.util.Log;
 import com.google.android.gms.phenotype.Configuration;
 import com.ionicframework.camptocamp893008.R;
 
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.views.MapView;
 
 public class nativemap extends CordovaPlugin {
 
-    CallbackContext cbContext;
+  CallbackContext cbContext;
 
 
-    public boolean execute(String action, final JSONArray args, CallbackContext callbackContext) {
-        final CordovaPlugin that = this;
-        this.cbContext = callbackContext;
+  public boolean execute(String action, final JSONArray args, CallbackContext callbackContext) {
+    final CordovaPlugin that = this;
+    this.cbContext = callbackContext;
 
-        PluginResult result = new PluginResult(PluginResult.Status.NO_RESULT);;
-        result.setKeepCallback(true);
-        Log.d("STATE","on est dans execute " + action);
-       if(action.equals("startMap"))
-        {
-            Log.d("STATE","onstart la map");
+    PluginResult result = new PluginResult(PluginResult.Status.NO_RESULT);;
+    result.setKeepCallback(true);
 
-            cordova.getThreadPool().execute(new Runnable() {
-                public void run() {
+    if(action.equals("startMap"))
+    {
+      Log.d("STATE","onstart la map");
 
-                    Intent intentMap = new Intent(that.cordova.getActivity().getBaseContext(), MapActivity.class);
-                    intentMap.setPackage(that.cordova.getActivity().getApplicationContext().getPackageName());
+      cordova.getThreadPool().execute(new Runnable() {
+        @Override
+        public void run() {
+          String center= "";
+          String iconList = "";
+          String route = "";
+          try {
+            center =  args.getString(0);
+            iconList =  args.getString(1);
+            route = args.getString(2);
+          } catch (JSONException e) {
+            e.printStackTrace();
+          }
 
-                    that.cordova.startActivityForResult(that, intentMap, 0);
-                }
-            });
+          Intent intentMap = new Intent(that.cordova.getActivity().getBaseContext(), MapActivity.class);
+          intentMap.putExtra("center",center);
+          intentMap.putExtra("iconList",iconList);
+          intentMap.putExtra("route",route);
 
-            callbackContext.sendPluginResult(result);
+          intentMap.setPackage(that.cordova.getActivity().getApplicationContext().getPackageName());
 
+
+          that.cordova.startActivityForResult(that, intentMap, 0);
         }
-        else {
-            result = new PluginResult(Status.INVALID_ACTION);
-            callbackContext.sendPluginResult(result);
+      });
 
-        }
+      callbackContext.sendPluginResult(result);
 
+    }
+    else {
+      result = new PluginResult(Status.INVALID_ACTION);
+      callbackContext.sendPluginResult(result);
 
-
-        return true;
     }
 
 
 
-
-    public void startMap() {
-
-
+    return true;
+  }
 
 
-    }
+
+
+  public void startMap() {
+
+
+
+
+  }
+
 
 }

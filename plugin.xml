@@ -11,8 +11,8 @@
     <platform name="android">
         <framework src="src/android/rules.gradle" custom="true" type="gradleReference" />
         <config-file target="config.xml" parent="/*">
-            <feature name="nativemap" >
-                <param name="android-package" value="com.webfit.nativemap"/>
+            <feature name="nativemap">
+                <param name="android-package" value="com.webfit.nativemap.nativemap"/>
             </feature>
         </config-file>
         <source-file src="src/android/nativemap.java" target-dir="src/com/webfit/nativemap" />

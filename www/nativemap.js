@@ -1,18 +1,12 @@
-//cordova.define('com.webfit.nativemap.nativemap', function(require, exports, module) {
-    console.log("create nativemap");
-    var exec = require('cordova/exec');
+var exec = require('cordova/exec');
 
-    var nativemap = {
+var nativemap = {
 
-        startMap : function(successCallback, failureCallback) {
+    startMap : function(center,iconList,route,successCallback, failureCallback) {
 
-            exec(successCallback, failureCallback, 'nativemap', 'startMap', []);
-        }
+        exec(successCallback, failureCallback, 'nativemap', 'startMap', [center,iconList,route]);
     }
+}
 
 
-    module.exports = nativemap;
-
-//cordova.define("cordova/plugin/gpsDetectionPlugin", gpsDetect);
-
-//});
+module.exports = nativemap;
