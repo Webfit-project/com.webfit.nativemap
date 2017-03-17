@@ -16,7 +16,8 @@
             </feature>
         </config-file>
         <source-file src="src/android/nativemap.java" target-dir="src/com/webfit/nativemap" />
-
+        <source-file src="src/android/MapActivity.java" target-dir="src/com/webfit/nativemap" />
+        <source-file src="src/android/img/icon_abri.png" target-dir="res/drawable-hdpi/icon_abri.png" />
         <config-file target="AndroidManifest.xml" parent="/manifest/application">
             <activity android:name="com.webfit.nativemap.MapActivity" android:label="Share"/>
         </config-file>
