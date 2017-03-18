@@ -21,7 +21,11 @@
         <config-file target="AndroidManifest.xml" parent="/manifest/application">
             <activity android:name="com.webfit.nativemap.MapActivity" android:label="Share"/>
         </config-file>
+        <config-file target="AndroidManifest.xml" parent="/manifest">
+            <uses-permission android:name="android.permission.CLEAR_APP_CACHE"/>
+        </config-file>
     </platform>
+    <!-- <uses-permission android:name="android.permission.CLEAR_APP_CACHE"/> -->
     <!--
     <platform name="ios">
         <config-file target="config.xml" parent="/*">

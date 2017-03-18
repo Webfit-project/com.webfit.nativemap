@@ -21,6 +21,8 @@ import org.json.JSONObject;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.views.MapView;
 
+import java.io.File;
+
 public class nativemap extends CordovaPlugin {
 
   CallbackContext cbContext;
@@ -66,6 +68,31 @@ public class nativemap extends CordovaPlugin {
       callbackContext.sendPluginResult(result);
 
     }
+    if(action.equals("getCacheSize")) {
+      JSONObject r = new JSONObject();
+      try {
+        r.put("size", this.initializeCache((that.cordova.getActivity().getBaseContext())));
+        callbackContext.success(r);
+      } catch (JSONException e) {
+        e.printStackTrace();
+        result = new PluginResult(Status.INVALID_ACTION);
+        callbackContext.sendPluginResult(result);
+      }
+
+
+    }
+    if(action.equals("clearCache")) {
+      if(this.deleteCache(that.cordova.getActivity().getBaseContext()))
+      {
+        result = new PluginResult(Status.INVALID_ACTION);
+        callbackContext.sendPluginResult(result);
+      }
+      else
+      {
+        result = new PluginResult(Status.INVALID_ACTION);
+        callbackContext.sendPluginResult(result);
+      }
+    }
     else {
       result = new PluginResult(Status.INVALID_ACTION);
       callbackContext.sendPluginResult(result);
@@ -80,11 +107,54 @@ public class nativemap extends CordovaPlugin {
 
 
 
-  public void startMap() {
+  public static boolean deleteCache(Context context) {
+    try {
+      File dir = context.getCacheDir();
+      deleteDir(dir);
+    } catch (Exception e) { return false;}
 
+    try {
+      File dir = context.getExternalCacheDir();
+      deleteDir(dir);
+    }
+    catch(Exception e ){}
+    return true;
+  }
 
+  public static boolean deleteDir(File dir) {
+    if (dir != null && dir.isDirectory()) {
+      String[] children = dir.list();
+      for (int i = 0; i < children.length; i++) {
+        boolean success = deleteDir(new File(dir, children[i]));
+        if (!success) {
+          return false;
+        }
+      }
+      return dir.delete();
+    } else if(dir!= null && dir.isFile()) {
+      return dir.delete();
+    } else {
+      return false;
+    }
+  }
 
+  private long initializeCache(Context context) {
+    long size = 0;
+    size += getDirSize(context.getCacheDir());
+    size += getDirSize(context.getExternalCacheDir());
+    return size;
+  }
 
+  public long getDirSize(File dir){
+    long size = 0;
+    for (File file : dir.listFiles()) {
+      if (file != null && file.isDirectory()) {
+        size += getDirSize(file);
+      } else if (file != null && file.isFile()) {
+        size += file.length();
+      }
+    }
+    return size;
   }
 
 
