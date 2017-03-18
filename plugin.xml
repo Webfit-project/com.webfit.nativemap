@@ -9,7 +9,7 @@
         <clobbers target="nativemap" />
     </js-module>
     <platform name="android">
-        <framework src="src/android/rules.gradle" custom="true" type="gradleReference" />
+       
         <config-file target="config.xml" parent="/*">
             <feature name="nativemap">
                 <param name="android-package" value="com.webfit.nativemap.nativemap"/>
@@ -27,6 +27,7 @@
     </platform>
     <!-- <uses-permission android:name="android.permission.CLEAR_APP_CACHE"/> -->
     <!--
+ <framework src="src/android/rules.gradle" custom="true" type="gradleReference" />
     <platform name="ios">
         <config-file target="config.xml" parent="/*">
             <feature name="Device">
