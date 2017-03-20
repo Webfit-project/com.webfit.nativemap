@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
-        id="com.webfit.nativemap" version="0.0.2">
+        id="com.webfit.nativemap" version="0.0.3">
     <name>Native map</name>
     <description>Cordova native map plugin</description>
     <license>Apache 2.0</license>
@@ -9,7 +9,6 @@
         <clobbers target="nativemap" />
     </js-module>
     <platform name="android">
-       
         <config-file target="config.xml" parent="/*">
             <feature name="nativemap">
                 <param name="android-package" value="com.webfit.nativemap.nativemap"/>
@@ -17,12 +16,19 @@
         </config-file>
         <source-file src="src/android/nativemap.java" target-dir="src/com/webfit/nativemap" />
         <source-file src="src/android/MapActivity.java" target-dir="src/com/webfit/nativemap" />
+        <source-file src="src/android/map.xml" target-dir="res/layout" />
         <source-file src="src/android/img/icon_abri.png" target-dir="res/drawable-hdpi/icon_abri.png" />
         <config-file target="AndroidManifest.xml" parent="/manifest/application">
-            <activity android:name="com.webfit.nativemap.MapActivity" android:label="Share"/>
+            <activity android:name="com.webfit.nativemap.MapActivity" android:label="Share" android:theme="@android:style/Theme.Black.NoTitleBar.Fullscreen"/>
         </config-file>
         <config-file target="AndroidManifest.xml" parent="/manifest">
             <uses-permission android:name="android.permission.CLEAR_APP_CACHE"/>
+            <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+            <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+            <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+            <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+            <uses-permission android:name="android.permission.INTERNET" />
+            <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
         </config-file>
     </platform>
     <!-- <uses-permission android:name="android.permission.CLEAR_APP_CACHE"/> -->
