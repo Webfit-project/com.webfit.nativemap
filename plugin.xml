@@ -25,7 +25,7 @@
         <source-file src="src/android/img/icon_camp.png" target-dir="res/drawable-hdpi/" />
         <source-file src="src/android/img/icon_camping.png" target-dir="res/drawable-hdpi/" />
         <source-file src="src/android/img/icon_canyon.png" target-dir="res/drawable-hdpi/" />
-        <source-file src="src/android/img/icon_cascade.png" target-dir="res/drawable-hdpi/i" />
+        <source-file src="src/android/img/icon_cascade.png" target-dir="res/drawable-hdpi/" />
         <source-file src="src/android/img/icon_col.png" target-dir="res/drawable-hdpi/" />
         <source-file src="src/android/img/icon_decollage.png" target-dir="res/drawable-hdpi/" />
         <source-file src="src/android/img/icon_escalade.png" target-dir="res/drawable-hdpi/" />
