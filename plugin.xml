@@ -18,6 +18,30 @@
         <source-file src="src/android/MapActivity.java" target-dir="src/com/webfit/nativemap" />
         <source-file src="src/android/map.xml" target-dir="res/layout" />
         <source-file src="src/android/img/icon_abri.png" target-dir="res/drawable-hdpi/icon_abri.png" />
+        <source-file src="src/android/img/icon_acces.png" target-dir="res/drawable-hdpi/icon_acces.png" />
+        <source-file src="src/android/img/icon_atterrissage.png" target-dir="res/drawable-hdpi/icon_atterrissage.png" />
+        <source-file src="src/android/img/icon_bisse.png" target-dir="res/drawable-hdpi/icon_bisse.png" />
+        <source-file src="src/android/img/icon_bivouac.png" target-dir="res/drawable-hdpi/icon_bivouac.png" />
+        <source-file src="src/android/img/icon_camp.png" target-dir="res/drawable-hdpi/icon_camp.png" />
+        <source-file src="src/android/img/icon_camping.png" target-dir="res/drawable-hdpi/icon_camping.png" />
+        <source-file src="src/android/img/icon_canyon.png" target-dir="res/drawable-hdpi/icon_canyon.png" />
+        <source-file src="src/android/img/icon_cascade.png" target-dir="res/drawable-hdpi/icon_cascade.png" />
+        <source-file src="src/android/img/icon_col.png" target-dir="res/drawable-hdpi/icon_col.png" />
+        <source-file src="src/android/img/icon_decollage.png" target-dir="res/drawable-hdpi/icon_decollage.png" />
+        <source-file src="src/android/img/icon_escalade.png" target-dir="res/drawable-hdpi/icon_escalade.png" />
+        <source-file src="src/android/img/icon_gite.png" target-dir="res/drawable-hdpi/icon_gite.png" />
+        <source-file src="src/android/img/icon_grotte.png" target-dir="res/drawable-hdpi/icon_grotte.png" />
+        <source-file src="src/android/img/icon_lac.png" target-dir="res/drawable-hdpi/icon_lac.png" />
+        <source-file src="src/android/img/icon_lieu.png" target-dir="res/drawable-hdpi/icon_lieu.png" />
+        <source-file src="src/android/img/icon_meteo.png" target-dir="res/drawable-hdpi/icon_meteo.png" />
+        <source-file src="src/android/img/icon_produit.png" target-dir="res/drawable-hdpi/icon_produit.png" />
+        <source-file src="src/android/img/icon_refuge.png" target-dir="res/drawable-hdpi/icon_refuge.png" />
+        <source-file src="src/android/img/icon_sae.png" target-dir="res/drawable-hdpi/icon_sae.png" />
+        <source-file src="src/android/img/icon_sommet.png" target-dir="res/drawable-hdpi/icon_sommet.png" />
+        <source-file src="src/android/img/icon_source.png" target-dir="res/drawable-hdpi/icon_source.png" />
+        <source-file src="src/android/img/icon_virtuel.png" target-dir="res/drawable-hdpi/icon_virtuel.png" />
+        <source-file src="src/android/img/icon_webcam.png" target-dir="res/drawable-hdpi/icon_webcam.png" />      
+
         <config-file target="AndroidManifest.xml" parent="/manifest/application">
             <activity android:name="com.webfit.nativemap.MapActivity" android:label="Share" android:theme="@android:style/Theme.Black.NoTitleBar.Fullscreen"/>
         </config-file>
