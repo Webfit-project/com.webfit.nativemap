@@ -59,7 +59,7 @@ public class nativemap extends CordovaPlugin {
 
     }
 
-    if(action.equals("getCacheSize")) {
+    else if(action.equals("getCacheSize")) {
       cordova.getThreadPool().execute(new Runnable() {
         @Override
         public void run() {
@@ -100,7 +100,7 @@ public class nativemap extends CordovaPlugin {
 
       });
     }
-    if(action.equals("clearCache")) {
+    else if(action.equals("clearCache")) {
       cordova.getThreadPool().execute(new Runnable() {
 
         @Override
@@ -161,13 +161,7 @@ public class nativemap extends CordovaPlugin {
 
     }
 
-
-
     return true;
   }
-
-
-
-
 
 }

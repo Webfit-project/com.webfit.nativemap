@@ -3,15 +3,11 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
-import android.graphics.Paint;
-import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
-
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
-import android.widget.Toast;
 
 import com.ionicframework.camptocamp893008.R;
 
@@ -19,21 +15,20 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.osmdroid.api.IMapController;
-import org.osmdroid.events.MapListener;
-import org.osmdroid.events.ScrollEvent;
-import org.osmdroid.events.ZoomEvent;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
-import org.osmdroid.views.overlay.ItemizedIconOverlay;
 import org.osmdroid.views.overlay.ItemizedOverlay;
+import org.osmdroid.views.overlay.Marker;
 import org.osmdroid.views.overlay.OverlayItem;
-import org.osmdroid.views.overlay.PathOverlay;
+import org.osmdroid.views.overlay.Polyline;
 import org.osmdroid.views.overlay.ScaleBarOverlay;
 import org.osmdroid.views.overlay.compass.CompassOverlay;
 import org.osmdroid.views.overlay.compass.InternalCompassOrientationProvider;
+import org.osmdroid.views.overlay.infowindow.MarkerInfoWindow;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by Nicolas on 15/03/2017.
@@ -61,7 +56,7 @@ public class MapActivity extends Activity implements View.OnClickListener {
 
     mapView = (MapView) findViewById(R.id.map);
     mapView.setTileSource(TileSourceFactory.MAPNIK);
-    mapView.setLayerType(View.LAYER_TYPE_SOFTWARE,null);
+    //mapView.setLayerType(View.LAYER_TYPE_SOFTWARE,null);
     IMapController mapController = mapView.getController();
     try {
       JSONObject centerObject = new JSONObject(center);
@@ -79,7 +74,7 @@ public class MapActivity extends Activity implements View.OnClickListener {
     mapView.setMultiTouchControls(true);
     mapView.setTilesScaledToDpi(true);
     final DisplayMetrics dm = ctx.getResources().getDisplayMetrics();
-
+/*
     mapView.setMapListener(new MapListener() {
       @Override
       public boolean onScroll(ScrollEvent event) {
@@ -95,17 +90,17 @@ public class MapActivity extends Activity implements View.OnClickListener {
         }
         else
         {
-          mapView.setLayerType(View.LAYER_TYPE_SOFTWARE,null);
+          // mapView.setLayerType(View.LAYER_TYPE_SOFTWARE,null);
 
         }
         return false;
       }
 
     } );
+*/
 
 
-
-    mScaleBarOverlay = new ScaleBarOverlay(ctx);
+    mScaleBarOverlay = new ScaleBarOverlay(mapView);
     mScaleBarOverlay.setCentred(true);
     mScaleBarOverlay.setScaleBarOffset(dm.widthPixels / 2, 10);
 
@@ -125,6 +120,37 @@ public class MapActivity extends Activity implements View.OnClickListener {
   }
 
   public void addRoute(String route) {
+
+    Polyline polyline;
+    List<GeoPoint> polylines = new ArrayList<GeoPoint>();
+    try {
+      JSONObject iconObject = new JSONObject(route);
+      JSONArray jArray = iconObject.getJSONArray("list");
+
+      for (int i = 0; i < jArray.length(); i++) {
+        JSONObject json_data = jArray.getJSONObject(i);
+        GeoPoint gpt = new GeoPoint(json_data.getDouble("lat"), json_data.getDouble("lon"));
+        polylines.add(gpt);
+
+
+      }
+
+    } catch (JSONException e) {
+      e.printStackTrace();
+    }
+
+    polyline = new Polyline(MapActivity.this);
+    polyline.setPoints (polylines);
+    polyline.setColor(Color.argb(95, 39, 185, 0));
+    polyline.setWidth(10);
+/*
+    polyline.setInfoWindow(new BasicInfoWindow(R.layout.bonuspack_bubble, mapView));
+    polyline.setTitle("Polyline tapped!");
+    */
+    mapView.getOverlays().add(polyline);
+
+
+    /*
     PathOverlay myPath = new PathOverlay(Color.argb(95, 39, 185, 0), this);
 
 
@@ -148,7 +174,7 @@ public class MapActivity extends Activity implements View.OnClickListener {
     myPath.setPaint(pPaint);
 
 
-    mapView.getOverlays().add(myPath);
+    mapView.getOverlays().add(myPath);*/
   }
 
 
@@ -170,11 +196,150 @@ public class MapActivity extends Activity implements View.OnClickListener {
           ", lon" + json_data.getDouble("lon") +
           ", icon" + json_data.getString("icon")  );
 
+        Marker startMarker = new Marker(mapView);
+        startMarker.setPosition(new GeoPoint(json_data.getDouble("lat") ,json_data.getDouble("lon") ));
+        startMarker.setIcon(getResources().getDrawable(R.drawable.icon_sommet));
+        startMarker.setTitle("jkdfghspdifj");
+        startMarker.setAnchor(Marker.ANCHOR_CENTER, 1.0f);
+        MarkerInfoWindow infoWindow = new MarkerInfoWindow(org.osmdroid.bonuspack.R.layout.bonuspack_bubble, mapView);
+        startMarker.setInfoWindow(infoWindow);
+
+        switch(json_data.getString("icon"))
+        {
+          case "ic_sommet":
+            startMarker.setIcon(getResources().getDrawable(R.drawable.icon_sommet));
+
+            break;
+          case "icon_abri":
+            startMarker.setIcon(getResources().getDrawable(R.drawable.icon_abri));
+
+
+            break;
+
+          case "icon_acces":
+            startMarker.setIcon(getResources().getDrawable(R.drawable.icon_acces));
+
+            break;
+
+          case "icon_atterrissage":
+            startMarker.setIcon(getResources().getDrawable(R.drawable.icon_atterrissage));
+
+            break;
+
+          case "icon_bisse":
+            startMarker.setIcon(getResources().getDrawable(R.drawable.icon_bisse));
+
+            break;
+
+          case "icon_bivouac":
+            startMarker.setIcon(getResources().getDrawable(R.drawable.icon_bivouac));
+
+            break;
+
+          case "icon_camp":
+            startMarker.setIcon(getResources().getDrawable(R.drawable.icon_camp));
+
+            break;
+
+          case "icon_camping":
+            startMarker.setIcon(getResources().getDrawable(R.drawable.icon_camping));
+
+            break;
+
+          case "icon_canyon":
+            startMarker.setIcon(getResources().getDrawable(R.drawable.icon_canyon));
+
+            break;
+
+          case "icon_cascade":
+            startMarker.setIcon(getResources().getDrawable(R.drawable.icon_cascade));
+
+            break;
+
+          case "icon_col":
+            startMarker.setIcon(getResources().getDrawable(R.drawable.icon_col));
+
+            break;
+
+          case "icon_decollage":
+            startMarker.setIcon(getResources().getDrawable(R.drawable.icon_decollage));
+
+            break;
+
+          case "icon_escalade":
+            startMarker.setIcon(getResources().getDrawable(R.drawable.icon_escalade));
+
+            break;
+
+          case "icon_gite":
+            startMarker.setIcon(getResources().getDrawable(R.drawable.icon_gite));
+
+            break;
+
+          case "icon_grotte":
+            startMarker.setIcon(getResources().getDrawable(R.drawable.icon_grotte));
+
+            break;
+
+          case "icon_lac":
+            startMarker.setIcon(getResources().getDrawable(R.drawable.icon_lac));
+
+            break;
+
+          case "icon_lieu":
+            startMarker.setIcon(getResources().getDrawable(R.drawable.icon_lieu));
+
+            break;
+
+          case "icon_meteo":
+            startMarker.setIcon(getResources().getDrawable(R.drawable.icon_meteo));
+
+            break;
+
+          case "icon_produit":
+            startMarker.setIcon(getResources().getDrawable(R.drawable.icon_produit));
+
+            break;
+
+          case "icon_refuge":
+            startMarker.setIcon(getResources().getDrawable(R.drawable.icon_refuge));
+
+            break;
+
+          case "icon_sae":
+            startMarker.setIcon(getResources().getDrawable(R.drawable.icon_sae));
+
+            break;
+
+          case "icon_source":
+            startMarker.setIcon(getResources().getDrawable(R.drawable.icon_source));
+
+            break;
+
+          case "icon_virtuel":
+            startMarker.setIcon(getResources().getDrawable(R.drawable.icon_virtuel));
+
+            break;
+
+          case "icon_webcam":
+            startMarker.setIcon(getResources().getDrawable(R.drawable.icon_webcam));
+
+            break;
+
+          default:
+            break;
+
+
+        }
+
+        mapView.getOverlays().add(startMarker);
+/*
         OverlayItem olItem;
 
 
         olItem = new OverlayItem(json_data.getString("title"), json_data.getString("description"),new GeoPoint(json_data.getDouble("lat"), json_data.getDouble("lon")));
         Drawable newMarker= null;
+
         switch(json_data.getString("icon"))
         {
           case "ic_sommet":
@@ -183,6 +348,7 @@ public class MapActivity extends Activity implements View.OnClickListener {
             break;
           case "icon_abri":
             newMarker = this.getResources().getDrawable(R.drawable.icon_abri);
+
             olItem.setMarker(newMarker);
             break;
 
@@ -303,6 +469,8 @@ public class MapActivity extends Activity implements View.OnClickListener {
         }
 
         items.add(olItem);
+*/
+
 
 
       }
@@ -312,30 +480,37 @@ public class MapActivity extends Activity implements View.OnClickListener {
     }
 
 
-
+/*
     this.itemOverlay = new ItemizedIconOverlay<>(getApplicationContext(),items,
       new ItemizedIconOverlay.OnItemGestureListener<OverlayItem>() {
+
         @Override
         public boolean onItemSingleTapUp(final int index, final OverlayItem item) {
+
+
+
           Toast.makeText(
             MapActivity.this,
             "Item '" + item.getTitle() + "' (index=" + index
               + ") got single tapped up", Toast.LENGTH_LONG).show();
+
           return true; // We 'handled' this event.
         }
 
         @Override
         public boolean onItemLongPress(final int index, final OverlayItem item) {
+
           Toast.makeText(
             MapActivity.this,
             "Item '" + item.getTitle() + "' (index=" + index
               + ") got long pressed", Toast.LENGTH_LONG).show();
+
           return false;
         }
       });
 
     mapView.getOverlays().add(this.itemOverlay);
-
+*/
 
   }
 
