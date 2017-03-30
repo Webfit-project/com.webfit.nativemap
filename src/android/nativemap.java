@@ -1,6 +1,8 @@
 package com.webfit.nativemap;
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Bundle;
 import android.util.Log;
 
 import org.apache.cordova.CallbackContext;
@@ -12,6 +14,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.util.Iterator;
+import java.util.Set;
 
 public class nativemap extends CordovaPlugin {
 
@@ -51,7 +55,7 @@ public class nativemap extends CordovaPlugin {
           intentMap.setPackage(that.cordova.getActivity().getApplicationContext().getPackageName());
 
 
-          that.cordova.startActivityForResult(that, intentMap, 0);
+          that.cordova.startActivityForResult(that, intentMap, 10);
         }
       });
 
@@ -163,5 +167,28 @@ public class nativemap extends CordovaPlugin {
 
     return true;
   }
+  @Override
+  public void onActivityResult(int requestCode, int resultCode, Intent data)
+  {
+    if( requestCode == 10 )
+    {
 
+      if( resultCode == Activity.RESULT_OK && data.hasExtra("id_obj") )
+      {
+        PluginResult result = new PluginResult(PluginResult.Status.OK, data.getStringExtra("id_obj"));
+        result.setKeepCallback(true);
+        this.cbContext.sendPluginResult(result);
+      }
+      else if(resultCode == Activity.RESULT_OK) {
+        PluginResult result = new PluginResult(PluginResult.Status.NO_RESULT);
+        this.cbContext.sendPluginResult(result);
+      }
+      else
+      {
+        PluginResult result = new PluginResult(PluginResult.Status.ERROR, "no params returned successfully" );
+        result.setKeepCallback(true);
+        this.cbContext.sendPluginResult(result);
+      }
+    }
+  }
 }

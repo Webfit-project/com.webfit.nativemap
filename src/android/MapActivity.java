@@ -8,6 +8,9 @@ import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.ionicframework.camptocamp893008.R;
 
@@ -15,12 +18,13 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.osmdroid.api.IMapController;
+import org.osmdroid.bonuspack.utils.BonusPackHelper;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
-import org.osmdroid.views.overlay.ItemizedOverlay;
 import org.osmdroid.views.overlay.Marker;
 import org.osmdroid.views.overlay.OverlayItem;
+import org.osmdroid.views.overlay.OverlayWithIW;
 import org.osmdroid.views.overlay.Polyline;
 import org.osmdroid.views.overlay.ScaleBarOverlay;
 import org.osmdroid.views.overlay.compass.CompassOverlay;
@@ -34,12 +38,11 @@ import java.util.List;
  * Created by Nicolas on 15/03/2017.
  */
 
-public class MapActivity extends Activity implements View.OnClickListener {
+final public class MapActivity extends Activity implements View.OnClickListener {
   protected MapView mapView;
   private ScaleBarOverlay mScaleBarOverlay;
   private CompassOverlay mCompassOverlay=null;
 
-  private ItemizedOverlay<OverlayItem>itemOverlay;
 
   @Override public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
@@ -56,7 +59,7 @@ public class MapActivity extends Activity implements View.OnClickListener {
 
     mapView = (MapView) findViewById(R.id.map);
     mapView.setTileSource(TileSourceFactory.MAPNIK);
-    //mapView.setLayerType(View.LAYER_TYPE_SOFTWARE,null);
+
     IMapController mapController = mapView.getController();
     try {
       JSONObject centerObject = new JSONObject(center);
@@ -74,30 +77,7 @@ public class MapActivity extends Activity implements View.OnClickListener {
     mapView.setMultiTouchControls(true);
     mapView.setTilesScaledToDpi(true);
     final DisplayMetrics dm = ctx.getResources().getDisplayMetrics();
-/*
-    mapView.setMapListener(new MapListener() {
-      @Override
-      public boolean onScroll(ScrollEvent event) {
-        return false;
-      }
 
-      @Override
-      public boolean onZoom(ZoomEvent event) {
-        if(mapView.getZoomLevel() < 13)
-        {
-          mapView.setLayerType(View.LAYER_TYPE_HARDWARE,null);
-
-        }
-        else
-        {
-          // mapView.setLayerType(View.LAYER_TYPE_SOFTWARE,null);
-
-        }
-        return false;
-      }
-
-    } );
-*/
 
 
     mScaleBarOverlay = new ScaleBarOverlay(mapView);
@@ -143,38 +123,11 @@ public class MapActivity extends Activity implements View.OnClickListener {
     polyline.setPoints (polylines);
     polyline.setColor(Color.argb(95, 39, 185, 0));
     polyline.setWidth(10);
-/*
-    polyline.setInfoWindow(new BasicInfoWindow(R.layout.bonuspack_bubble, mapView));
-    polyline.setTitle("Polyline tapped!");
-    */
+
     mapView.getOverlays().add(polyline);
 
 
-    /*
-    PathOverlay myPath = new PathOverlay(Color.argb(95, 39, 185, 0), this);
 
-
-    try {
-      JSONObject iconObject = new JSONObject(route);
-      JSONArray jArray = iconObject.getJSONArray("list");
-
-      for (int i = 0; i < jArray.length(); i++) {
-        JSONObject json_data = jArray.getJSONObject(i);
-        GeoPoint gpt = new GeoPoint(json_data.getDouble("lat"), json_data.getDouble("lon"));
-        myPath.addPoint(gpt);
-      }
-    } catch (JSONException e) {
-      e.printStackTrace();
-    }
-
-
-    Paint pPaint = myPath.getPaint();
-    pPaint.setStyle(Paint.Style.STROKE);
-    pPaint.setStrokeWidth(10);
-    myPath.setPaint(pPaint);
-
-
-    mapView.getOverlays().add(myPath);*/
   }
 
 
@@ -199,9 +152,11 @@ public class MapActivity extends Activity implements View.OnClickListener {
         Marker startMarker = new Marker(mapView);
         startMarker.setPosition(new GeoPoint(json_data.getDouble("lat") ,json_data.getDouble("lon") ));
         startMarker.setIcon(getResources().getDrawable(R.drawable.icon_sommet));
-        startMarker.setTitle("jkdfghspdifj");
+        startMarker.setTitle(json_data.getString("title"));
+        startMarker.setSubDescription(json_data.getString("description"));
         startMarker.setAnchor(Marker.ANCHOR_CENTER, 1.0f);
-        MarkerInfoWindow infoWindow = new MarkerInfoWindow(org.osmdroid.bonuspack.R.layout.bonuspack_bubble, mapView);
+
+        CustomInfoWindow infoWindow = new CustomInfoWindow(R.layout.bubble,mapView,this);
         startMarker.setInfoWindow(infoWindow);
 
         switch(json_data.getString("icon"))
@@ -325,7 +280,10 @@ public class MapActivity extends Activity implements View.OnClickListener {
             startMarker.setIcon(getResources().getDrawable(R.drawable.icon_webcam));
 
             break;
+          case "icon_itineraire":
+            startMarker.setIcon(getResources().getDrawable(R.drawable.icon_itineraire));
 
+            break;
           default:
             break;
 
@@ -333,184 +291,12 @@ public class MapActivity extends Activity implements View.OnClickListener {
         }
 
         mapView.getOverlays().add(startMarker);
-/*
-        OverlayItem olItem;
-
-
-        olItem = new OverlayItem(json_data.getString("title"), json_data.getString("description"),new GeoPoint(json_data.getDouble("lat"), json_data.getDouble("lon")));
-        Drawable newMarker= null;
-
-        switch(json_data.getString("icon"))
-        {
-          case "ic_sommet":
-            newMarker = this.getResources().getDrawable(R.drawable.icon_sommet);
-            olItem.setMarker(newMarker);
-            break;
-          case "icon_abri":
-            newMarker = this.getResources().getDrawable(R.drawable.icon_abri);
-
-            olItem.setMarker(newMarker);
-            break;
-
-          case "icon_acces":
-            newMarker = this.getResources().getDrawable(R.drawable.icon_acces);
-            olItem.setMarker(newMarker);
-            break;
-
-          case "icon_atterrissage":
-            newMarker = this.getResources().getDrawable(R.drawable.icon_atterrissage);
-            olItem.setMarker(newMarker);
-            break;
-
-          case "icon_bisse":
-            newMarker = this.getResources().getDrawable(R.drawable.icon_bisse);
-            olItem.setMarker(newMarker);
-            break;
-
-          case "icon_bivouac":
-            newMarker = this.getResources().getDrawable(R.drawable.icon_bivouac);
-            olItem.setMarker(newMarker);
-            break;
-
-          case "icon_camp":
-            newMarker = this.getResources().getDrawable(R.drawable.icon_camp);
-            olItem.setMarker(newMarker);
-            break;
-
-          case "icon_camping":
-            newMarker = this.getResources().getDrawable(R.drawable.icon_camping);
-            olItem.setMarker(newMarker);
-            break;
-
-          case "icon_canyon":
-            newMarker = this.getResources().getDrawable(R.drawable.icon_canyon);
-            olItem.setMarker(newMarker);
-            break;
-
-          case "icon_cascade":
-            newMarker = this.getResources().getDrawable(R.drawable.icon_cascade);
-            olItem.setMarker(newMarker);
-            break;
-
-          case "icon_col":
-            newMarker = this.getResources().getDrawable(R.drawable.icon_col);
-            olItem.setMarker(newMarker);
-            break;
-
-          case "icon_decollage":
-            newMarker = this.getResources().getDrawable(R.drawable.icon_decollage);
-            olItem.setMarker(newMarker);
-            break;
-
-          case "icon_escalade":
-            newMarker = this.getResources().getDrawable(R.drawable.icon_escalade);
-            olItem.setMarker(newMarker);
-            break;
-
-          case "icon_gite":
-            newMarker = this.getResources().getDrawable(R.drawable.icon_gite);
-            olItem.setMarker(newMarker);
-            break;
-
-          case "icon_grotte":
-            newMarker = this.getResources().getDrawable(R.drawable.icon_grotte);
-            olItem.setMarker(newMarker);
-            break;
-
-          case "icon_lac":
-            newMarker = this.getResources().getDrawable(R.drawable.icon_lac);
-            olItem.setMarker(newMarker);
-            break;
-
-          case "icon_lieu":
-            newMarker = this.getResources().getDrawable(R.drawable.icon_lieu);
-            olItem.setMarker(newMarker);
-            break;
-
-          case "icon_meteo":
-            newMarker = this.getResources().getDrawable(R.drawable.icon_meteo);
-            olItem.setMarker(newMarker);
-            break;
-
-          case "icon_produit":
-            newMarker = this.getResources().getDrawable(R.drawable.icon_produit);
-            olItem.setMarker(newMarker);
-            break;
-
-          case "icon_refuge":
-            newMarker = this.getResources().getDrawable(R.drawable.icon_refuge);
-            olItem.setMarker(newMarker);
-            break;
-
-          case "icon_sae":
-            newMarker = this.getResources().getDrawable(R.drawable.icon_sae);
-            olItem.setMarker(newMarker);
-            break;
-
-          case "icon_source":
-            newMarker = this.getResources().getDrawable(R.drawable.icon_source);
-            olItem.setMarker(newMarker);
-            break;
-
-          case "icon_virtuel":
-            newMarker = this.getResources().getDrawable(R.drawable.icon_virtuel);
-            olItem.setMarker(newMarker);
-            break;
-
-          case "icon_webcam":
-            newMarker = this.getResources().getDrawable(R.drawable.icon_webcam);
-            olItem.setMarker(newMarker);
-            break;
-
-          default:
-            break;
-
-
-        }
-
-        items.add(olItem);
-*/
-
-
 
       }
 
     } catch (JSONException e) {
       e.printStackTrace();
     }
-
-
-/*
-    this.itemOverlay = new ItemizedIconOverlay<>(getApplicationContext(),items,
-      new ItemizedIconOverlay.OnItemGestureListener<OverlayItem>() {
-
-        @Override
-        public boolean onItemSingleTapUp(final int index, final OverlayItem item) {
-
-
-
-          Toast.makeText(
-            MapActivity.this,
-            "Item '" + item.getTitle() + "' (index=" + index
-              + ") got single tapped up", Toast.LENGTH_LONG).show();
-
-          return true; // We 'handled' this event.
-        }
-
-        @Override
-        public boolean onItemLongPress(final int index, final OverlayItem item) {
-
-          Toast.makeText(
-            MapActivity.this,
-            "Item '" + item.getTitle() + "' (index=" + index
-              + ") got long pressed", Toast.LENGTH_LONG).show();
-
-          return false;
-        }
-      });
-
-    mapView.getOverlays().add(this.itemOverlay);
-*/
 
   }
 
@@ -522,6 +308,78 @@ public class MapActivity extends Activity implements View.OnClickListener {
 
   @Override
   public void onClick(View v) {
+
+  }
+}
+
+
+
+class CustomInfoWindow extends  MarkerInfoWindow {
+
+  MapActivity mapactivity;
+
+  static int mTitleId=BonusPackHelper.UNDEFINED_RES_ID,
+    mDescriptionId=BonusPackHelper.UNDEFINED_RES_ID,
+    mSubDescriptionId=BonusPackHelper.UNDEFINED_RES_ID,
+    mImageId=BonusPackHelper.UNDEFINED_RES_ID; //resource ids
+
+  private static void setResIds(Context context){
+    String packageName = context.getPackageName(); //get application package name
+    mTitleId = context.getResources().getIdentifier("id/bubble_title", null, packageName);
+    mDescriptionId = context.getResources().getIdentifier("id/bubble_description", null, packageName);
+    mSubDescriptionId = context.getResources().getIdentifier("id/bubble_subdescription", null, packageName);
+    mImageId = context.getResources().getIdentifier("id/bubble_image", null, packageName);
+    if (mTitleId == BonusPackHelper.UNDEFINED_RES_ID || mDescriptionId == BonusPackHelper.UNDEFINED_RES_ID
+      || mSubDescriptionId == BonusPackHelper.UNDEFINED_RES_ID || mImageId == BonusPackHelper.UNDEFINED_RES_ID) {
+      Log.e(BonusPackHelper.LOG_TAG, "BasicInfoWindow: unable to get res ids in "+packageName);
+    }
+  }
+
+  public CustomInfoWindow(int layoutResId, MapView mapView, MapActivity mapactivity) {
+    super(layoutResId, mapView);
+
+    this.mapactivity = mapactivity;
+
+    if (mTitleId == BonusPackHelper.UNDEFINED_RES_ID)
+      setResIds(mapView.getContext());
+
+  }
+
+
+  public void onClose() {
+  }
+
+  public void onOpen(Object arg0) {
+
+    OverlayWithIW overlay = (OverlayWithIW)arg0;
+    String title = overlay.getTitle();
+    String subDesc = overlay.getSubDescription();
+    LinearLayout layout = (LinearLayout) mView.findViewById(R.id.bubble);
+    Button btnMoreInfo = (Button) mView.findViewById(R.id.bubble_moreinfo);
+    Button btnShow = (Button) mView.findViewById(R.id.bubble_show);
+    TextView txtTitle = (TextView) mView.findViewById(R.id.bubble_title);
+    TextView txtDescription = (TextView) mView.findViewById(R.id.bubble_description);
+
+
+    txtTitle.setText(title);
+    txtDescription.setText(subDesc);
+
+    layout.setOnClickListener(new View.OnClickListener() {
+      public void onClick(View v) {
+
+      }
+    });
+
+
+    btnShow.setOnClickListener(new View.OnClickListener() {
+
+      public void onClick(View view) {
+        Intent returnIntent = new Intent();
+        returnIntent.putExtra("id_obj","123");
+        mapactivity.setResult(Activity.RESULT_OK,returnIntent);
+        mapactivity.finish();
+      }
+    });
 
   }
 }

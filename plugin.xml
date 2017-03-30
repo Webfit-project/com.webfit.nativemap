@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
-        id="com.webfit.nativemap" version="0.0.4">
+        id="com.webfit.nativemap" version="0.0.5">
     <name>Native map</name>
     <description>Cordova native map plugin</description>
     <license>Apache 2.0</license>
@@ -40,8 +40,10 @@
         <source-file src="src/android/img/icon_sommet.png" target-dir="res/drawable-hdpi/" />
         <source-file src="src/android/img/icon_source.png" target-dir="res/drawable-hdpi/" />
         <source-file src="src/android/img/icon_virtuel.png" target-dir="res/drawable-hdpi/" />
-        <source-file src="src/android/img/icon_webcam.png" target-dir="res/drawable-hdpi/" />      
-
+        <source-file src="src/android/img/icon_webcam.png" target-dir="res/drawable-hdpi/" />    
+        <source-file src="src/android/img/icon_itineraire.png" target-dir="res/drawable-hdpi/" />   
+        <source-file src="src/android/img/bubble.9.png" target-dir="res/drawable-hdpi/" />
+        <source-file src="src/android/img/btn_moreinfo.png" target-dir="res/drawable-hdpi/" />  
         <config-file target="AndroidManifest.xml" parent="/manifest/application">
             <activity android:name="com.webfit.nativemap.MapActivity" android:label="Share" android:theme="@android:style/Theme.Black.NoTitleBar.Fullscreen"/>
         </config-file>
