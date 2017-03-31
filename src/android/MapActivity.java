@@ -148,12 +148,12 @@ final public class MapActivity extends Activity implements View.OnClickListener 
           ", lat" + json_data.getDouble("lat") +
           ", lon" + json_data.getDouble("lon") +
           ", icon" + json_data.getString("icon")  );
-
         Marker startMarker = new Marker(mapView);
         startMarker.setPosition(new GeoPoint(json_data.getDouble("lat") ,json_data.getDouble("lon") ));
         startMarker.setIcon(getResources().getDrawable(R.drawable.icon_sommet));
         startMarker.setTitle(json_data.getString("title"));
-        startMarker.setSubDescription(json_data.getString("description"));
+        if(json_data.getString("description") != "null")
+          startMarker.setSubDescription(json_data.getString("description"));
         startMarker.setAnchor(Marker.ANCHOR_CENTER, 1.0f);
 
         CustomInfoWindow infoWindow = new CustomInfoWindow(R.layout.bubble,mapView,this);
