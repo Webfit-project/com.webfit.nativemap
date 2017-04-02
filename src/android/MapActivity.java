@@ -54,7 +54,7 @@ final public class MapActivity extends Activity implements View.OnClickListener 
     String center = intent.getStringExtra("center");
     String iconList = intent.getStringExtra("iconList");
     String route =  intent.getStringExtra("route");
-
+    String zoom =  intent.getStringExtra("zoom");
 
 
     mapView = (MapView) findViewById(R.id.map);
@@ -70,9 +70,9 @@ final public class MapActivity extends Activity implements View.OnClickListener 
       GeoPoint point2 = new GeoPoint(44.923001,  6.359711);
       mapController.setCenter(point2);
     }
-
-    mapController.setZoom(15);
-    mapView.setMaxZoomLevel(25);
+  int zoomLevel = Integer.parseInt(zoom);
+    mapController.setZoom(zoomLevel);
+    mapView.setMaxZoomLevel(zoomLevel);
 
     mapView.setMultiTouchControls(true);
     mapView.setTilesScaledToDpi(true);
@@ -322,7 +322,7 @@ class CustomInfoWindow extends  MarkerInfoWindow {
     mDescriptionId=BonusPackHelper.UNDEFINED_RES_ID,
     mSubDescriptionId=BonusPackHelper.UNDEFINED_RES_ID,
     mImageId=BonusPackHelper.UNDEFINED_RES_ID; //resource ids
-    String id;
+  String id;
   private static void setResIds(Context context){
     String packageName = context.getPackageName(); //get application package name
     mTitleId = context.getResources().getIdentifier("id/bubble_title", null, packageName);

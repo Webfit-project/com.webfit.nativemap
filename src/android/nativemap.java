@@ -39,10 +39,12 @@ public class nativemap extends CordovaPlugin {
           String center= "";
           String iconList = "";
           String route = "";
+          String zoom = "";
           try {
             center =  args.getString(0);
             iconList =  args.getString(1);
             route = args.getString(2);
+              zoom = args.getString(3);
           } catch (JSONException e) {
             e.printStackTrace();
           }
@@ -51,7 +53,7 @@ public class nativemap extends CordovaPlugin {
           intentMap.putExtra("center",center);
           intentMap.putExtra("iconList",iconList);
           intentMap.putExtra("route",route);
-
+            intentMap.putExtra("zoom",zoom);
           intentMap.setPackage(that.cordova.getActivity().getApplicationContext().getPackageName());
 
 
