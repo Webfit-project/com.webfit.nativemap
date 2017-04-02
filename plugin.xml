@@ -17,6 +17,7 @@
         <source-file src="src/android/nativemap.java" target-dir="src/com/webfit/nativemap" />
         <source-file src="src/android/MapActivity.java" target-dir="src/com/webfit/nativemap" />
         <source-file src="src/android/map.xml" target-dir="res/layout" />
+        <source-file src="src/android/bubble.xml" target-dir="res/layout" />
         <source-file src="src/android/img/icon_abri.png" target-dir="res/drawable-hdpi/" />
         <source-file src="src/android/img/icon_acces.png" target-dir="res/drawable-hdpi/" />
         <source-file src="src/android/img/icon_atterrissage.png" target-dir="res/drawable-hdpi/" />

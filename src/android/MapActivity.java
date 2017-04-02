@@ -156,127 +156,127 @@ final public class MapActivity extends Activity implements View.OnClickListener 
           startMarker.setSubDescription(json_data.getString("description"));
         startMarker.setAnchor(Marker.ANCHOR_CENTER, 1.0f);
 
-        CustomInfoWindow infoWindow = new CustomInfoWindow(R.layout.bubble,mapView,this);
+        CustomInfoWindow infoWindow = new CustomInfoWindow(R.layout.bubble,mapView,this,json_data.getString("id"));
         startMarker.setInfoWindow(infoWindow);
 
         switch(json_data.getString("icon"))
         {
-          case "ic_sommet":
+          case "summit":
             startMarker.setIcon(getResources().getDrawable(R.drawable.icon_sommet));
 
             break;
-          case "icon_abri":
+          case "shelter":
             startMarker.setIcon(getResources().getDrawable(R.drawable.icon_abri));
 
 
             break;
 
-          case "icon_acces":
+          case "access":
             startMarker.setIcon(getResources().getDrawable(R.drawable.icon_acces));
 
             break;
 
-          case "icon_atterrissage":
+          case "paragliding_landing":
             startMarker.setIcon(getResources().getDrawable(R.drawable.icon_atterrissage));
 
             break;
 
-          case "icon_bisse":
+          case "bisse":
             startMarker.setIcon(getResources().getDrawable(R.drawable.icon_bisse));
 
             break;
 
-          case "icon_bivouac":
+          case "bivouac":
             startMarker.setIcon(getResources().getDrawable(R.drawable.icon_bivouac));
 
             break;
 
-          case "icon_camp":
+          case "base_camp":
             startMarker.setIcon(getResources().getDrawable(R.drawable.icon_camp));
 
             break;
 
-          case "icon_camping":
+          case "camp_site":
             startMarker.setIcon(getResources().getDrawable(R.drawable.icon_camping));
 
             break;
 
-          case "icon_canyon":
+          case "canyon":
             startMarker.setIcon(getResources().getDrawable(R.drawable.icon_canyon));
 
             break;
 
-          case "icon_cascade":
+          case "waterfall":
             startMarker.setIcon(getResources().getDrawable(R.drawable.icon_cascade));
 
             break;
 
-          case "icon_col":
+          case "pass":
             startMarker.setIcon(getResources().getDrawable(R.drawable.icon_col));
 
             break;
 
-          case "icon_decollage":
+          case "paragliding_takeoff":
             startMarker.setIcon(getResources().getDrawable(R.drawable.icon_decollage));
 
             break;
 
-          case "icon_escalade":
+          case "climbing_outdoor":
             startMarker.setIcon(getResources().getDrawable(R.drawable.icon_escalade));
 
             break;
 
-          case "icon_gite":
+          case "gite":
             startMarker.setIcon(getResources().getDrawable(R.drawable.icon_gite));
 
             break;
 
-          case "icon_grotte":
+          case "cave":
             startMarker.setIcon(getResources().getDrawable(R.drawable.icon_grotte));
 
             break;
 
-          case "icon_lac":
+          case "lake":
             startMarker.setIcon(getResources().getDrawable(R.drawable.icon_lac));
 
             break;
 
-          case "icon_lieu":
+          case "locality":
             startMarker.setIcon(getResources().getDrawable(R.drawable.icon_lieu));
 
             break;
 
-          case "icon_meteo":
+          case "weather_station":
             startMarker.setIcon(getResources().getDrawable(R.drawable.icon_meteo));
 
             break;
 
-          case "icon_produit":
+          case "local_product":
             startMarker.setIcon(getResources().getDrawable(R.drawable.icon_produit));
 
             break;
 
-          case "icon_refuge":
+          case "hut":
             startMarker.setIcon(getResources().getDrawable(R.drawable.icon_refuge));
 
             break;
 
-          case "icon_sae":
+          case "climbing_indoor":
             startMarker.setIcon(getResources().getDrawable(R.drawable.icon_sae));
 
             break;
 
-          case "icon_source":
+          case "waterpoint":
             startMarker.setIcon(getResources().getDrawable(R.drawable.icon_source));
 
             break;
 
-          case "icon_virtuel":
+          case "virtual":
             startMarker.setIcon(getResources().getDrawable(R.drawable.icon_virtuel));
 
             break;
 
-          case "icon_webcam":
+          case "webcam":
             startMarker.setIcon(getResources().getDrawable(R.drawable.icon_webcam));
 
             break;
@@ -322,7 +322,7 @@ class CustomInfoWindow extends  MarkerInfoWindow {
     mDescriptionId=BonusPackHelper.UNDEFINED_RES_ID,
     mSubDescriptionId=BonusPackHelper.UNDEFINED_RES_ID,
     mImageId=BonusPackHelper.UNDEFINED_RES_ID; //resource ids
-
+    String id;
   private static void setResIds(Context context){
     String packageName = context.getPackageName(); //get application package name
     mTitleId = context.getResources().getIdentifier("id/bubble_title", null, packageName);
@@ -335,9 +335,9 @@ class CustomInfoWindow extends  MarkerInfoWindow {
     }
   }
 
-  public CustomInfoWindow(int layoutResId, MapView mapView, MapActivity mapactivity) {
+  public CustomInfoWindow(int layoutResId, MapView mapView, MapActivity mapactivity, String id) {
     super(layoutResId, mapView);
-
+    this.id = id;
     this.mapactivity = mapactivity;
 
     if (mTitleId == BonusPackHelper.UNDEFINED_RES_ID)
@@ -354,9 +354,10 @@ class CustomInfoWindow extends  MarkerInfoWindow {
     OverlayWithIW overlay = (OverlayWithIW)arg0;
     String title = overlay.getTitle();
     String subDesc = overlay.getSubDescription();
+
     LinearLayout layout = (LinearLayout) mView.findViewById(R.id.bubble);
     Button btnMoreInfo = (Button) mView.findViewById(R.id.bubble_moreinfo);
-    Button btnShow = (Button) mView.findViewById(R.id.bubble_show);
+    final Button btnShow = (Button) mView.findViewById(R.id.bubble_show);
     TextView txtTitle = (TextView) mView.findViewById(R.id.bubble_title);
     TextView txtDescription = (TextView) mView.findViewById(R.id.bubble_description);
 
@@ -374,8 +375,9 @@ class CustomInfoWindow extends  MarkerInfoWindow {
     btnShow.setOnClickListener(new View.OnClickListener() {
 
       public void onClick(View view) {
+
         Intent returnIntent = new Intent();
-        returnIntent.putExtra("id_obj","123");
+        returnIntent.putExtra("id_obj",id);
         mapactivity.setResult(Activity.RESULT_OK,returnIntent);
         mapactivity.finish();
       }
