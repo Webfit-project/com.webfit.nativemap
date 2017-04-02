@@ -72,7 +72,7 @@ final public class MapActivity extends Activity implements View.OnClickListener 
     }
   int zoomLevel = Integer.parseInt(zoom);
     mapController.setZoom(zoomLevel);
-    mapView.setMaxZoomLevel(zoomLevel);
+    mapView.setMaxZoomLevel(25);
 
     mapView.setMultiTouchControls(true);
     mapView.setTilesScaledToDpi(true);
@@ -121,7 +121,8 @@ final public class MapActivity extends Activity implements View.OnClickListener 
 
     polyline = new Polyline(MapActivity.this);
     polyline.setPoints (polylines);
-    polyline.setColor(Color.argb(95, 39, 185, 0));
+    //polyline.setColor(Color.argb(95, 39, 185, 0));
+    polyline.setColor(Color.argb(250, 225, 72, 79));
     polyline.setWidth(10);
 
     mapView.getOverlays().add(polyline);

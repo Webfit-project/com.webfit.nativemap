@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
-        id="com.webfit.nativemap" version="0.0.5">
+        id="com.webfit.nativemap" version="0.0.6">
     <name>Native map</name>
     <description>Cordova native map plugin</description>
     <license>Apache 2.0</license>
