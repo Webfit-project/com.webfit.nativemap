@@ -2,7 +2,9 @@ package com.webfit.nativemap;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
@@ -11,6 +13,7 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.support.v4.app.ActivityCompat;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -125,17 +128,16 @@ final public class MapActivity extends Activity implements View.OnClickListener,
     }
 
     mapView.getOverlays().add(this.mLocationOverlay);
-
     mapView.getOverlays().add(this.mScaleBarOverlay);
-    Log.d("STATE", "iconlist in activity = " + iconList);
 
-    if(btcenter == "1") {
-      btCenterMap = (ImageButton) findViewById(R.id.ic_center_map);
 
+    btCenterMap = (ImageButton) findViewById(R.id.ic_center_map);
+
+    if(btcenter.equals("1")) {
       btCenterMap.setOnClickListener(new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-          Log.i("state", "centerMap clicked ");
+
           if (currentLocation != null) {
             GeoPoint myPosition = new GeoPoint(currentLocation.getLatitude(), currentLocation.getLongitude());
             mapView.getController().animateTo(myPosition);
@@ -143,13 +145,18 @@ final public class MapActivity extends Activity implements View.OnClickListener,
         }
       });
     }
-    if(btfollow == "1") {
-      btFollowMe = (ImageButton) findViewById(R.id.ic_follow_me);
+    else
+    {
+      btCenterMap.setVisibility(View.GONE);
+    }
+    btFollowMe = (ImageButton) findViewById(R.id.ic_follow_me);
 
+
+
+    if(btfollow.equals("1")) {
       btFollowMe.setOnClickListener(new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-          Log.i("state", "btFollowMe clicked ");
           if (!mLocationOverlay.isFollowLocationEnabled()) {
 
             enableLocation();
@@ -166,6 +173,9 @@ final public class MapActivity extends Activity implements View.OnClickListener,
           }
         }
       });
+    }
+    else {
+      btFollowMe.setVisibility(View.GONE);
     }
     mapView.getOverlays().add(this.mScaleBarOverlay);
 
@@ -208,8 +218,6 @@ final public class MapActivity extends Activity implements View.OnClickListener,
 
 
   public void addItem(String iconList) {
-    Log.d("STATE", "iconlist = " + iconList);
-
 
     try {
       JSONObject iconObject = new JSONObject(iconList);
@@ -217,12 +225,7 @@ final public class MapActivity extends Activity implements View.OnClickListener,
 
       for (int i = 0; i < jArray.length(); i++) {
         JSONObject json_data = jArray.getJSONObject(i);
-        Log.i("log_tag", "title=" + json_data.getString("title") +
-          ", description" + json_data.getString("description") +
-          ", id" + json_data.getString("id") +
-          ", lat" + json_data.getDouble("lat") +
-          ", lon" + json_data.getDouble("lon") +
-          ", icon" + json_data.getString("icon"));
+
         Marker startMarker = new Marker(mapView);
         startMarker.setPosition(new GeoPoint(json_data.getDouble("lat"), json_data.getDouble("lon")));
         startMarker.setIcon(getResources().getDrawable(R.drawable.icon_sommet));
@@ -390,6 +393,34 @@ final public class MapActivity extends Activity implements View.OnClickListener,
   private void enableLocation()
   {
     lm = (LocationManager) ctx.getSystemService(Context.LOCATION_SERVICE);
+    boolean gps_enabled = false;
+    try {
+      gps_enabled = lm.isProviderEnabled(LocationManager.GPS_PROVIDER);
+    } catch(Exception ex) {}
+
+    if(!gps_enabled){
+      AlertDialog.Builder dialog = new AlertDialog.Builder(MapActivity.this);
+      dialog.setMessage("Le gps doit être activé pour utiliser le suivi de votre position.");
+      dialog.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+        @Override
+        public void onClick(DialogInterface paramDialogInterface, int paramInt) {
+          // TODO Auto-generated method stub
+          Intent myIntent = new Intent( Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+          MapActivity.this.startActivity(myIntent);
+
+          //get gps
+        }
+      });
+      dialog.setNegativeButton("Fermer", new DialogInterface.OnClickListener() {
+
+        @Override
+        public void onClick(DialogInterface paramDialogInterface, int paramInt) {
+          // TODO Auto-generated method stub
+
+        }
+      });
+      dialog.show();
+    }
     try {
       //this fails on AVD 19s, even with the appcompat check, says no provided named gps is available
       lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0l, 0f, this);
@@ -431,7 +462,6 @@ final public class MapActivity extends Activity implements View.OnClickListener,
   @Override
   public void onResume() {
     super.onResume();
-    Log.d("STATE", "on lance onresume et la geoloc qui va avec");
     if(enablePosition) {
       lm = (LocationManager) ctx.getSystemService(Context.LOCATION_SERVICE);
       try {
