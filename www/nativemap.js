@@ -2,8 +2,8 @@ var exec = require('cordova/exec');
 
 var nativemap = {
 
-    startMap : function(center,iconList,route,zoom,successCallback, failureCallback) {
-        exec(successCallback, failureCallback, 'nativemap', 'startMap', [center,iconList,route,zoom]);
+    startMap : function(center,iconList,route,zoom,btfollow,btcenter,successCallback, failureCallback) {
+        exec(successCallback, failureCallback, 'nativemap', 'startMap', [center,iconList,route,zoom,btfollow,btcenter]);
     },
     
     getCacheSize: function(successCallback, failureCallback) {

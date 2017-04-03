@@ -1,14 +1,22 @@
 package com.webfit.nativemap;
+
+import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -29,7 +37,10 @@ import org.osmdroid.views.overlay.Polyline;
 import org.osmdroid.views.overlay.ScaleBarOverlay;
 import org.osmdroid.views.overlay.compass.CompassOverlay;
 import org.osmdroid.views.overlay.compass.InternalCompassOrientationProvider;
+import org.osmdroid.views.overlay.gestures.RotationGestureOverlay;
 import org.osmdroid.views.overlay.infowindow.MarkerInfoWindow;
+import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider;
+import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,24 +49,33 @@ import java.util.List;
  * Created by Nicolas on 15/03/2017.
  */
 
-final public class MapActivity extends Activity implements View.OnClickListener {
+final public class MapActivity extends Activity implements View.OnClickListener, LocationListener {
   protected MapView mapView;
   private ScaleBarOverlay mScaleBarOverlay;
-  private CompassOverlay mCompassOverlay=null;
-
-
-  @Override public void onCreate(Bundle savedInstanceState) {
+  private MyLocationNewOverlay mLocationOverlay;
+  private CompassOverlay mCompassOverlay = null;
+  private LocationManager lm;
+  private Location currentLocation = null;
+  private RotationGestureOverlay mRotationGestureOverlay;
+  private Marker myposition = null;
+  private boolean enablePosition = false;
+  protected ImageButton btCenterMap;
+  protected ImageButton btFollowMe;
+  private Context ctx;
+  @Override
+  public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
-    Context ctx = getApplicationContext();
+    ctx = getApplicationContext();
 
-    Log.d("STATE","on est dans map activity");
+    Log.d("STATE", "on est dans map activity");
     setContentView(R.layout.map);
     Intent intent = getIntent();
     String center = intent.getStringExtra("center");
     String iconList = intent.getStringExtra("iconList");
-    String route =  intent.getStringExtra("route");
-    String zoom =  intent.getStringExtra("zoom");
-
+    String route = intent.getStringExtra("route");
+    String zoom = intent.getStringExtra("zoom");
+    String btfollow = intent.getStringExtra("btfollow");
+    String btcenter = intent.getStringExtra("btcenter");
 
     mapView = (MapView) findViewById(R.id.map);
     mapView.setTileSource(TileSourceFactory.MAPNIK);
@@ -67,11 +87,22 @@ final public class MapActivity extends Activity implements View.OnClickListener 
       mapController.setCenter(point2);
     } catch (JSONException e) {
       e.printStackTrace();
-      GeoPoint point2 = new GeoPoint(44.923001,  6.359711);
+      GeoPoint point2 = new GeoPoint(44.923001, 6.359711);
       mapController.setCenter(point2);
     }
-  int zoomLevel = Integer.parseInt(zoom);
+    int zoomLevel = Integer.parseInt(zoom);
     mapController.setZoom(zoomLevel);
+
+    /*
+    mRotationGestureOverlay = new RotationGestureOverlay(mapView);
+    mRotationGestureOverlay.setEnabled(true);
+
+
+
+    mapView.getOverlays().add(this.mLocationOverlay);
+
+    */
+
     mapView.setMaxZoomLevel(25);
 
     mapView.setMultiTouchControls(true);
@@ -79,23 +110,68 @@ final public class MapActivity extends Activity implements View.OnClickListener 
     final DisplayMetrics dm = ctx.getResources().getDisplayMetrics();
 
 
-
     mScaleBarOverlay = new ScaleBarOverlay(mapView);
     mScaleBarOverlay.setCentred(true);
     mScaleBarOverlay.setScaleBarOffset(dm.widthPixels / 2, 10);
 
+
     if (Build.VERSION.SDK_INT > Build.VERSION_CODES.FROYO) {
-      mCompassOverlay = new CompassOverlay(ctx, new InternalCompassOrientationProvider(ctx),
-        mapView);
+      mCompassOverlay = new CompassOverlay(ctx, new InternalCompassOrientationProvider(ctx), mapView);
       mCompassOverlay.enableCompass();
       mapView.getOverlays().add(this.mCompassOverlay);
+
+      this.mLocationOverlay = new MyLocationNewOverlay(new GpsMyLocationProvider(ctx), mapView);
+
     }
 
+    mapView.getOverlays().add(this.mLocationOverlay);
 
     mapView.getOverlays().add(this.mScaleBarOverlay);
-    Log.d("STATE","iconlist in activity = "+ iconList);
-    this.addItem(iconList);
+    Log.d("STATE", "iconlist in activity = " + iconList);
+
+    if(btcenter == "1") {
+      btCenterMap = (ImageButton) findViewById(R.id.ic_center_map);
+
+      btCenterMap.setOnClickListener(new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+          Log.i("state", "centerMap clicked ");
+          if (currentLocation != null) {
+            GeoPoint myPosition = new GeoPoint(currentLocation.getLatitude(), currentLocation.getLongitude());
+            mapView.getController().animateTo(myPosition);
+          }
+        }
+      });
+    }
+    if(btfollow == "1") {
+      btFollowMe = (ImageButton) findViewById(R.id.ic_follow_me);
+
+      btFollowMe.setOnClickListener(new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+          Log.i("state", "btFollowMe clicked ");
+          if (!mLocationOverlay.isFollowLocationEnabled()) {
+
+            enableLocation();
+            enablePosition = true;
+            mLocationOverlay.enableFollowLocation();
+            showMyPosition();
+            btFollowMe.setImageResource(R.drawable.ic_follow_me_on);
+          } else {
+            hideMyPosition();
+            stopLocation();
+            enablePosition = false;
+            mLocationOverlay.disableFollowLocation();
+            btFollowMe.setImageResource(R.drawable.ic_follow_me);
+          }
+        }
+      });
+    }
+    mapView.getOverlays().add(this.mScaleBarOverlay);
+
     this.addRoute(route);
+    this.addItem(iconList);
+
 
   }
 
@@ -120,7 +196,7 @@ final public class MapActivity extends Activity implements View.OnClickListener 
     }
 
     polyline = new Polyline(MapActivity.this);
-    polyline.setPoints (polylines);
+    polyline.setPoints(polylines);
     //polyline.setColor(Color.argb(95, 39, 185, 0));
     polyline.setColor(Color.argb(250, 225, 72, 79));
     polyline.setWidth(10);
@@ -128,40 +204,37 @@ final public class MapActivity extends Activity implements View.OnClickListener 
     mapView.getOverlays().add(polyline);
 
 
-
   }
 
 
-  public void addItem(String iconList)
-  {
-    Log.d("STATE","iconlist = " + iconList);
-    final ArrayList<OverlayItem> items = new ArrayList<>();
+  public void addItem(String iconList) {
+    Log.d("STATE", "iconlist = " + iconList);
+
 
     try {
       JSONObject iconObject = new JSONObject(iconList);
       JSONArray jArray = iconObject.getJSONArray("list");
 
-      for(int i=0; i<jArray.length(); i++){
+      for (int i = 0; i < jArray.length(); i++) {
         JSONObject json_data = jArray.getJSONObject(i);
         Log.i("log_tag", "title=" + json_data.getString("title") +
           ", description" + json_data.getString("description") +
           ", id" + json_data.getString("id") +
           ", lat" + json_data.getDouble("lat") +
           ", lon" + json_data.getDouble("lon") +
-          ", icon" + json_data.getString("icon")  );
+          ", icon" + json_data.getString("icon"));
         Marker startMarker = new Marker(mapView);
-        startMarker.setPosition(new GeoPoint(json_data.getDouble("lat") ,json_data.getDouble("lon") ));
+        startMarker.setPosition(new GeoPoint(json_data.getDouble("lat"), json_data.getDouble("lon")));
         startMarker.setIcon(getResources().getDrawable(R.drawable.icon_sommet));
         startMarker.setTitle(json_data.getString("title"));
-        if(json_data.getString("description") != "null")
+        if (json_data.getString("description") != "null")
           startMarker.setSubDescription(json_data.getString("description"));
         startMarker.setAnchor(Marker.ANCHOR_CENTER, 1.0f);
 
-        CustomInfoWindow infoWindow = new CustomInfoWindow(R.layout.bubble,mapView,this,json_data.getString("id"));
+        CustomInfoWindow infoWindow = new CustomInfoWindow(R.layout.bubble, mapView, this, json_data.getString("id"));
         startMarker.setInfoWindow(infoWindow);
 
-        switch(json_data.getString("icon"))
-        {
+        switch (json_data.getString("icon")) {
           case "summit":
             startMarker.setIcon(getResources().getDrawable(R.drawable.icon_sommet));
 
@@ -285,6 +358,11 @@ final public class MapActivity extends Activity implements View.OnClickListener 
             startMarker.setIcon(getResources().getDrawable(R.drawable.icon_itineraire));
 
             break;
+
+          case "misc":
+            startMarker.setIcon(getResources().getDrawable(R.drawable.icon_misc));
+
+            break;
           default:
             break;
 
@@ -301,16 +379,141 @@ final public class MapActivity extends Activity implements View.OnClickListener 
 
   }
 
-  public void onResume(){
-    super.onResume();
+  private void stopLocation(){
+    try {
+      lm.removeUpdates(this);
+    } catch (Exception ex) {
+    }
+    mLocationOverlay.disableFollowLocation();
+    mLocationOverlay.disableMyLocation();
+  }
+  private void enableLocation()
+  {
+    lm = (LocationManager) ctx.getSystemService(Context.LOCATION_SERVICE);
+    try {
+      //this fails on AVD 19s, even with the appcompat check, says no provided named gps is available
+      lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0l, 0f, this);
+    } catch (Exception ex) {
+    }
+
+    try {
+      if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+        // TODO: Consider calling
+        //    ActivityCompat#requestPermissions
+        // here to request the missing permissions, and then overriding
+        //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+        //                                          int[] grantResults)
+        // to handle the case where the user grants the permission. See the documentation
+        // for ActivityCompat#requestPermissions for more details.
+        return;
+      }
+      lm.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0l, 0f, this);
+    } catch (Exception ex) {
+    }
+
+    mLocationOverlay.enableFollowLocation();
+    mLocationOverlay.enableMyLocation();
+  }
+  @Override
+  public void onPause() {
+    super.onPause();
+    try {
+      lm.removeUpdates(this);
+    } catch (Exception ex) {
+    }
+
+    mCompassOverlay.disableCompass();
+    mLocationOverlay.disableFollowLocation();
+    mLocationOverlay.disableMyLocation();
 
   }
 
+  @Override
+  public void onResume() {
+    super.onResume();
+    Log.d("STATE", "on lance onresume et la geoloc qui va avec");
+    if(enablePosition) {
+      lm = (LocationManager) ctx.getSystemService(Context.LOCATION_SERVICE);
+      try {
+        //this fails on AVD 19s, even with the appcompat check, says no provided named gps is available
+        lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0l, 0f, this);
+      } catch (Exception ex) {
+      }
+
+      try {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+          // TODO: Consider calling
+          //    ActivityCompat#requestPermissions
+          // here to request the missing permissions, and then overriding
+          //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+          //                                          int[] grantResults)
+          // to handle the case where the user grants the permission. See the documentation
+          // for ActivityCompat#requestPermissions for more details.
+          return;
+        }
+        lm.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0l, 0f, this);
+      } catch (Exception ex) {
+      }
+
+      mLocationOverlay.enableFollowLocation();
+      mLocationOverlay.enableMyLocation();
+
+    }
+
+  }
+
+  private void showMyPosition() {
+    if(myposition == null) {
+      myposition = new Marker(mapView);
+      if (currentLocation != null) {
+        myposition.setPosition(new GeoPoint(currentLocation.getLatitude(), currentLocation.getLongitude()));
+      }
+
+      myposition.setIcon(getResources().getDrawable(R.drawable.icon_myposition));
+      myposition.setTitle("Ma position");
+      mapView.getOverlays().add(myposition);
+    }
+    else
+    {
+      myposition.setEnabled(true);
+    }
+  }
+
+  private void hideMyPosition() {
+    if(myposition != null) {
+      myposition.setEnabled(false);
+    }
+  }
 
   @Override
   public void onClick(View v) {
 
   }
+
+  @Override
+  public void onLocationChanged(Location location) {
+    currentLocation=location;
+    if(myposition != null){
+      myposition.setPosition(new GeoPoint(currentLocation.getLatitude(), currentLocation.getLongitude()));
+    }
+  }
+
+  @Override
+  public void onStatusChanged(String provider, int status, Bundle extras) {
+
+  }
+
+  @Override
+  public void onProviderEnabled(String provider) {
+
+  }
+
+  @Override
+  public void onProviderDisabled(String provider) {
+
+  }
+
+
 }
 
 

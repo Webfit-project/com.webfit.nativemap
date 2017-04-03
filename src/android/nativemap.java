@@ -2,7 +2,7 @@ package com.webfit.nativemap;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.os.Bundle;
+
 import android.util.Log;
 
 import org.apache.cordova.CallbackContext;
@@ -14,8 +14,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
-import java.util.Iterator;
-import java.util.Set;
+
 
 public class nativemap extends CordovaPlugin {
 
@@ -40,11 +39,15 @@ public class nativemap extends CordovaPlugin {
           String iconList = "";
           String route = "";
           String zoom = "";
+          String btfollow = "";
+          String btcenter = "";
           try {
             center =  args.getString(0);
             iconList =  args.getString(1);
             route = args.getString(2);
               zoom = args.getString(3);
+            btfollow = args.getString(4);
+            btcenter  = args.getString(5);
           } catch (JSONException e) {
             e.printStackTrace();
           }
@@ -54,6 +57,8 @@ public class nativemap extends CordovaPlugin {
           intentMap.putExtra("iconList",iconList);
           intentMap.putExtra("route",route);
             intentMap.putExtra("zoom",zoom);
+          intentMap.putExtra("btfollow",btfollow);
+          intentMap.putExtra("btcenter",btcenter);
           intentMap.setPackage(that.cordova.getActivity().getApplicationContext().getPackageName());
 
 
