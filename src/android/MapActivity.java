@@ -47,6 +47,8 @@ import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 /**
  * Created by Nicolas on 15/03/2017.
@@ -58,6 +60,8 @@ final public class MapActivity extends Activity implements View.OnClickListener,
   private MyLocationNewOverlay mLocationOverlay;
   private CompassOverlay mCompassOverlay = null;
   private LocationManager lm;
+  private Polyline myroute;
+  private List<GeoPoint> myroutePolylines;
   private Location currentLocation = null;
   private RotationGestureOverlay mRotationGestureOverlay;
   private Marker myposition = null;
@@ -76,6 +80,7 @@ final public class MapActivity extends Activity implements View.OnClickListener,
     String center = intent.getStringExtra("center");
     String iconList = intent.getStringExtra("iconList");
     String route = intent.getStringExtra("route");
+    String myroute = intent.getStringExtra("myroute");
     String zoom = intent.getStringExtra("zoom");
     String btfollow = intent.getStringExtra("btfollow");
     String btcenter = intent.getStringExtra("btcenter");
@@ -170,6 +175,8 @@ final public class MapActivity extends Activity implements View.OnClickListener,
             enablePosition = false;
             mLocationOverlay.disableFollowLocation();
             btFollowMe.setImageResource(R.drawable.ic_follow_me);
+
+
           }
         }
       });
@@ -178,13 +185,79 @@ final public class MapActivity extends Activity implements View.OnClickListener,
       btFollowMe.setVisibility(View.GONE);
     }
     mapView.getOverlays().add(this.mScaleBarOverlay);
-
+    this.addMyRoute(myroute);
     this.addRoute(route);
     this.addItem(iconList);
 
 
   }
+  public void addMyRoute(String route) {
 
+     myroutePolylines = new ArrayList<GeoPoint>();
+    try {
+      JSONObject iconObject = new JSONObject(route);
+      JSONArray jArray = iconObject.getJSONArray("list");
+
+      for (int i = 0; i < jArray.length(); i++) {
+        JSONObject json_data = jArray.getJSONObject(i);
+        GeoPoint gpt = new GeoPoint(json_data.getDouble("lat"), json_data.getDouble("lon"));
+        myroutePolylines.add(gpt);
+
+
+      }
+
+    } catch (JSONException e) {
+      e.printStackTrace();
+    }
+
+    myroute = new Polyline(MapActivity.this);
+    myroute.setPoints( myroutePolylines);
+    myroute.setColor(Color.argb(200,246, 135, 18));
+    myroute.setWidth(10);
+
+    mapView.getOverlays().add(myroute);
+
+/*
+    Timer timer = new Timer();
+    timer.schedule(new TimerTask() {
+      int i = 0;
+      @Override
+      public void run() {
+        addnewcoord(i++);
+      }
+    }, 0, 5000);
+*/
+  }
+/*
+  public void addnewcoord(int i)
+  {
+
+    Log.e(BonusPackHelper.LOG_TAG, "on ajoute une nouvelle coordonnée " + i);
+
+
+    if(myposition != null) {
+      if (myposition.isEnabled()) {
+
+        if (currentLocation != null) {
+          Log.e(BonusPackHelper.LOG_TAG, "new lat:" + (currentLocation.getLatitude()+0.0005+(i/100) ));
+          myposition.setPosition(new GeoPoint(currentLocation.getLatitude()+0.0005+i/100, currentLocation.getLongitude()+0.0005+i/100));
+
+          GeoPoint gpt = new GeoPoint(currentLocation.getLatitude()+0.0005+i/100, currentLocation.getLongitude()+0.0005+i/100);
+          Log.e(BonusPackHelper.LOG_TAG, "longueur tab : " + myroutePolylines.size());
+
+          myroutePolylines.add(gpt);
+          myroutePolylines.add(new GeoPoint(46.122099600000006, 35));
+          myroutePolylines.add(new GeoPoint(46.12206, 36));
+
+          myroute.setPoints( myroutePolylines);
+
+        }
+
+
+      }
+    }
+  }
+*/
   public void addRoute(String route) {
 
     Polyline polyline;
@@ -499,6 +572,8 @@ final public class MapActivity extends Activity implements View.OnClickListener,
         myposition.setPosition(new GeoPoint(currentLocation.getLatitude(), currentLocation.getLongitude()));
       }
 
+
+
       myposition.setIcon(getResources().getDrawable(R.drawable.icon_myposition));
       myposition.setTitle("Ma position");
       mapView.getOverlays().add(myposition);
@@ -506,12 +581,14 @@ final public class MapActivity extends Activity implements View.OnClickListener,
     else
     {
       myposition.setEnabled(true);
+      myroute.setEnabled(true);
     }
   }
 
   private void hideMyPosition() {
     if(myposition != null) {
       myposition.setEnabled(false);
+      myroute.setEnabled(false);
     }
   }
 
@@ -525,7 +602,13 @@ final public class MapActivity extends Activity implements View.OnClickListener,
     currentLocation=location;
     if(myposition != null){
       myposition.setPosition(new GeoPoint(currentLocation.getLatitude(), currentLocation.getLongitude()));
+
+      myroutePolylines.add(new GeoPoint(currentLocation.getLatitude(), currentLocation.getLongitude()));
+      myroute.setPoints( myroutePolylines);
+
     }
+
+
   }
 
   @Override
