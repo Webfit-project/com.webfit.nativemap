@@ -146,6 +146,8 @@ final public class MapActivity extends Activity implements View.OnClickListener,
           if (currentLocation != null) {
             GeoPoint myPosition = new GeoPoint(currentLocation.getLatitude(), currentLocation.getLongitude());
             mapView.getController().animateTo(myPosition);
+
+            mapView.getController().zoomTo(16);
           }
         }
       });
