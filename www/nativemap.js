@@ -2,6 +2,14 @@ var exec = require('cordova/exec');
 
 var nativemap = {
 
+    requestWS: function(successCallback,failureCallback) {
+        exec(successCallback, failureCallback, 'nativemap', 'requestWES', []);
+    },
+
+    hasWESS: function(successCallback,failureCallback) {
+        exec(successCallback, failureCallback, 'nativemap', 'hasWES', []);
+    },
+
     startMap : function(center,iconList,route,myroute,zoom,btfollow,btcenter,successCallback, failureCallback) {
 
         exec(successCallback, failureCallback, 'nativemap', 'startMap', [center,iconList,route,myroute,zoom,btfollow,btcenter]);

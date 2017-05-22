@@ -1,8 +1,11 @@
 package com.webfit.nativemap;
+import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.util.Log;
 
 import org.apache.cordova.CallbackContext;
@@ -18,6 +21,7 @@ import java.io.File;
 
 public class nativemap extends CordovaPlugin {
 
+  private static final int WRITE_REQUEST_CODE = 43;
   CallbackContext cbContext;
 
 
@@ -27,8 +31,22 @@ public class nativemap extends CordovaPlugin {
 
     PluginResult result = new PluginResult(PluginResult.Status.NO_RESULT);
     result.setKeepCallback(true);
-
-    if(action.equals("startMap"))
+    if(action.equals("requestWES"))
+    {
+      String[] permissions = {Manifest.permission.WRITE_EXTERNAL_STORAGE,Manifest.permission.READ_EXTERNAL_STORAGE};
+      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+      this.cordova.getActivity().requestPermissions(permissions, WRITE_REQUEST_CODE);
+      }
+    }
+    else if(action.equals("hasWES")) {
+      if (!this.cordova.hasPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+        String[] permissions = {Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE};
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+          this.cordova.getActivity().requestPermissions(permissions, WRITE_REQUEST_CODE);
+        }
+      }
+    }
+    else if(action.equals("startMap"))
     {
       Log.d("STATE","onstart la map");
 
@@ -177,6 +195,8 @@ public class nativemap extends CordovaPlugin {
 
     return true;
   }
+
+
   @Override
   public void onActivityResult(int requestCode, int resultCode, Intent data)
   {
