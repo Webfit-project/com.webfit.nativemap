@@ -21,8 +21,29 @@ import java.io.File;
 
 public class nativemap extends CordovaPlugin {
 
-  private static final int WRITE_REQUEST_CODE = 43;
+  private static final int WRITE_REQUEST_CODE = 1;
   CallbackContext cbContext;
+
+
+  @Override
+  public void onRequestPermissionResult(int requestCode, String[] permissions, int[] grantResults) throws JSONException {
+
+
+    if(grantResults[0] == PackageManager.PERMISSION_GRANTED)
+    {
+      PluginResult result = new PluginResult(PluginResult.Status.OK);
+      result.setKeepCallback(true);
+      this.cbContext.sendPluginResult(result);
+    }
+    else
+    {
+      PluginResult result = new PluginResult(PluginResult.Status.ERROR, "refused" );
+      result.setKeepCallback(true);
+      this.cbContext.sendPluginResult(result);
+    }
+
+
+  }
 
 
   public boolean execute(String action, final JSONArray args, final CallbackContext callbackContext) {
@@ -35,14 +56,17 @@ public class nativemap extends CordovaPlugin {
     {
       String[] permissions = {Manifest.permission.WRITE_EXTERNAL_STORAGE,Manifest.permission.READ_EXTERNAL_STORAGE};
       if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-      this.cordova.getActivity().requestPermissions(permissions, WRITE_REQUEST_CODE);
+        this.cordova.requestPermissions(this,WRITE_REQUEST_CODE,permissions);
+
+
+
       }
     }
     else if(action.equals("hasWES")) {
       if (!this.cordova.hasPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
         String[] permissions = {Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE};
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-          this.cordova.getActivity().requestPermissions(permissions, WRITE_REQUEST_CODE);
+          this.cordova.requestPermissions(this,WRITE_REQUEST_CODE,permissions);
         }
       }
     }
