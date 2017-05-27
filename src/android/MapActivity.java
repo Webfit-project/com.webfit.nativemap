@@ -3,11 +3,17 @@ package com.webfit.nativemap;
 import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.graphics.drawable.BitmapDrawable;
+import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -34,7 +40,6 @@ import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.Marker;
-import org.osmdroid.views.overlay.OverlayItem;
 import org.osmdroid.views.overlay.OverlayWithIW;
 import org.osmdroid.views.overlay.Polyline;
 import org.osmdroid.views.overlay.ScaleBarOverlay;
@@ -65,9 +70,16 @@ final public class MapActivity extends Activity implements View.OnClickListener,
   private Location currentLocation = null;
   private RotationGestureOverlay mRotationGestureOverlay;
   private Marker myposition = null;
+  private Criteria criteria;
   private boolean enablePosition = false;
+  private boolean tracking = false;
   protected ImageButton btCenterMap;
   protected ImageButton btFollowMe;
+  BroadcastReceiver receiver = null;
+  IntentFilter filter;
+
+
+
   private Context ctx;
   @Override
   public void onCreate(Bundle savedInstanceState) {
@@ -84,6 +96,7 @@ final public class MapActivity extends Activity implements View.OnClickListener,
     String zoom = intent.getStringExtra("zoom");
     String btfollow = intent.getStringExtra("btfollow");
     String btcenter = intent.getStringExtra("btcenter");
+    String tracking = intent.getStringExtra("tracking");
 
     mapView = (MapView) findViewById(R.id.map);
     mapView.setTileSource(TileSourceFactory.MAPNIK);
@@ -129,13 +142,18 @@ final public class MapActivity extends Activity implements View.OnClickListener,
       mapView.getOverlays().add(this.mCompassOverlay);
 
       this.mLocationOverlay = new MyLocationNewOverlay(new GpsMyLocationProvider(ctx), mapView);
-
+      Bitmap bitmap = ((BitmapDrawable)getResources().getDrawable(R.drawable.icon_myposition)).getBitmap();
+      this.mLocationOverlay.setPersonIcon(bitmap);
     }
 
     mapView.getOverlays().add(this.mLocationOverlay);
     mapView.getOverlays().add(this.mScaleBarOverlay);
 
+    if(tracking.equals("1"))
+    {
 
+      this.tracking = true;
+    }
     btCenterMap = (ImageButton) findViewById(R.id.ic_center_map);
 
     if(btcenter.equals("1")) {
@@ -169,7 +187,8 @@ final public class MapActivity extends Activity implements View.OnClickListener,
             enableLocation();
             enablePosition = true;
             mLocationOverlay.enableFollowLocation();
-            showMyPosition();
+
+
             btFollowMe.setImageResource(R.drawable.ic_follow_me_on);
           } else {
             hideMyPosition();
@@ -187,15 +206,65 @@ final public class MapActivity extends Activity implements View.OnClickListener,
       btFollowMe.setVisibility(View.GONE);
     }
     mapView.getOverlays().add(this.mScaleBarOverlay);
+    if(this.tracking)
+    {
+
+      this.waitingNewCoord();
+      showMyPosition();
+    }
     this.addMyRoute(myroute);
     this.addRoute(route);
     this.addItem(iconList);
 
 
+
+
+
+
+  }
+
+  public void waitingNewCoord() {
+
+    receiver = new BroadcastReceiver() {
+
+      @Override
+      public void onReceive(Context context, Intent intent) {
+        String action = intent.getAction();
+
+        if(action.equals("NEW_COORD")){
+          Log.d("STATE", "NEW COORD: " + intent.getStringExtra("lat") + ","+intent.getStringExtra("lon"));
+          try {
+            double lat = Double.parseDouble(intent.getStringExtra("lat"));
+            double lon = Double.parseDouble(intent.getStringExtra("lon"));
+            GeoPoint geop = new GeoPoint(lat, lon);
+
+            myposition.setPosition(geop);
+
+            myroutePolylines.add(geop);
+            myroute.setPoints(myroutePolylines);
+
+            Location loc = new Location("");
+
+            loc.setLatitude(lat);
+            loc.setLongitude(lon);
+            currentLocation = loc;
+          } catch(Exception e)
+          {
+
+          }
+
+        }
+
+      }
+
+    };
+
+    filter = new IntentFilter("NEW_COORD");
+    registerReceiver(receiver, filter);
   }
   public void addMyRoute(String route) {
 
-     myroutePolylines = new ArrayList<GeoPoint>();
+    myroutePolylines = new ArrayList<GeoPoint>();
     try {
       JSONObject iconObject = new JSONObject(route);
       JSONArray jArray = iconObject.getJSONArray("list");
@@ -205,8 +274,24 @@ final public class MapActivity extends Activity implements View.OnClickListener,
         GeoPoint gpt = new GeoPoint(json_data.getDouble("lat"), json_data.getDouble("lon"));
         myroutePolylines.add(gpt);
 
+        if(i == jArray.length()-1)
+        {
+          if(myposition != null) {
+
+            Log.d("STATE", "MAPA on rajoute une position");
+            Location loc = new Location("");
+
+            loc.setLatitude(json_data.getDouble("lat"));
+            loc.setLongitude(json_data.getDouble("lon"));
+            currentLocation = loc;
+            myposition.setPosition(gpt);
+
+          }
+        }
 
       }
+
+
 
     } catch (JSONException e) {
       e.printStackTrace();
@@ -219,47 +304,9 @@ final public class MapActivity extends Activity implements View.OnClickListener,
 
     mapView.getOverlays().add(myroute);
 
-/*
-    Timer timer = new Timer();
-    timer.schedule(new TimerTask() {
-      int i = 0;
-      @Override
-      public void run() {
-        addnewcoord(i++);
-      }
-    }, 0, 5000);
-*/
+
   }
-/*
-  public void addnewcoord(int i)
-  {
 
-    Log.e(BonusPackHelper.LOG_TAG, "on ajoute une nouvelle coordonnée " + i);
-
-
-    if(myposition != null) {
-      if (myposition.isEnabled()) {
-
-        if (currentLocation != null) {
-          Log.e(BonusPackHelper.LOG_TAG, "new lat:" + (currentLocation.getLatitude()+0.0005+(i/100) ));
-          myposition.setPosition(new GeoPoint(currentLocation.getLatitude()+0.0005+i/100, currentLocation.getLongitude()+0.0005+i/100));
-
-          GeoPoint gpt = new GeoPoint(currentLocation.getLatitude()+0.0005+i/100, currentLocation.getLongitude()+0.0005+i/100);
-          Log.e(BonusPackHelper.LOG_TAG, "longueur tab : " + myroutePolylines.size());
-
-          myroutePolylines.add(gpt);
-          myroutePolylines.add(new GeoPoint(46.122099600000006, 35));
-          myroutePolylines.add(new GeoPoint(46.12206, 36));
-
-          myroute.setPoints( myroutePolylines);
-
-        }
-
-
-      }
-    }
-  }
-*/
   public void addRoute(String route) {
 
     Polyline polyline;
@@ -496,24 +543,34 @@ final public class MapActivity extends Activity implements View.OnClickListener,
       });
       dialog.show();
     }
+
+    criteria = new Criteria();
+    criteria.setAltitudeRequired(false);
+    criteria.setBearingRequired(false);
+    criteria.setSpeedRequired(true);
+    criteria.setCostAllowed(true);
+
     try {
-      //this fails on AVD 19s, even with the appcompat check, says no provided named gps is available
-      lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0l, 0f, this);
+
+      criteria.setAccuracy(Criteria.ACCURACY_FINE);
+      criteria.setHorizontalAccuracy(Criteria.ACCURACY_HIGH);
+      criteria.setPowerRequirement(Criteria.POWER_HIGH);
+
+
+      lm.requestLocationUpdates(lm.getBestProvider(criteria, true), 30000, 30, this);
     } catch (Exception ex) {
     }
 
     try {
       if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-        // TODO: Consider calling
-        //    ActivityCompat#requestPermissions
-        // here to request the missing permissions, and then overriding
-        //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-        //                                          int[] grantResults)
-        // to handle the case where the user grants the permission. See the documentation
-        // for ActivityCompat#requestPermissions for more details.
         return;
       }
-      lm.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0l, 0f, this);
+
+      criteria.setAccuracy(Criteria.ACCURACY_FINE);
+      criteria.setHorizontalAccuracy(Criteria.ACCURACY_HIGH);
+      criteria.setPowerRequirement(Criteria.POWER_HIGH);
+
+      lm.requestLocationUpdates(lm.getBestProvider(criteria, true), 30000, 30, this);
     } catch (Exception ex) {
     }
 
@@ -547,13 +604,7 @@ final public class MapActivity extends Activity implements View.OnClickListener,
 
       try {
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-          // TODO: Consider calling
-          //    ActivityCompat#requestPermissions
-          // here to request the missing permissions, and then overriding
-          //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-          //                                          int[] grantResults)
-          // to handle the case where the user grants the permission. See the documentation
-          // for ActivityCompat#requestPermissions for more details.
+
           return;
         }
         lm.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0l, 0f, this);
@@ -566,7 +617,15 @@ final public class MapActivity extends Activity implements View.OnClickListener,
     }
 
   }
+  @Override
+  protected void onDestroy() {
+    Log.d("STATE", "MAPA on destroy");
+    super.onDestroy();
+    if(receiver != null){
+      unregisterReceiver(receiver);
+    }
 
+  }
   private void showMyPosition() {
     if(myposition == null) {
       myposition = new Marker(mapView);
@@ -605,11 +664,7 @@ final public class MapActivity extends Activity implements View.OnClickListener,
     if(myposition != null){
       myposition.setPosition(new GeoPoint(currentLocation.getLatitude(), currentLocation.getLongitude()));
 
-      myroutePolylines.add(new GeoPoint(currentLocation.getLatitude(), currentLocation.getLongitude()));
-      myroute.setPoints( myroutePolylines);
-
     }
-
 
   }
 

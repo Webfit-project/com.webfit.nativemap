@@ -84,6 +84,7 @@ public class nativemap extends CordovaPlugin {
           String zoom = "";
           String btfollow = "";
           String btcenter = "";
+          String tracking = "";
           try {
             center =  args.getString(0);
             iconList =  args.getString(1);
@@ -92,6 +93,7 @@ public class nativemap extends CordovaPlugin {
             zoom = args.getString(4);
             btfollow = args.getString(5);
             btcenter  = args.getString(6);
+            tracking  = args.getString(7);
           } catch (JSONException e) {
             e.printStackTrace();
           }
@@ -104,6 +106,7 @@ public class nativemap extends CordovaPlugin {
           intentMap.putExtra("zoom",zoom);
           intentMap.putExtra("btfollow",btfollow);
           intentMap.putExtra("btcenter",btcenter);
+          intentMap.putExtra("tracking",tracking);
           intentMap.setPackage(that.cordova.getActivity().getApplicationContext().getPackageName());
 
 
