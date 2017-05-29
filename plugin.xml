@@ -60,4 +60,46 @@
             <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
         </config-file>
     </platform>
+    <platform name="ios">
+        <config-file target="config.xml" parent="/*">
+            <feature name="nativemap">
+                <param name="ios-package" value="CDVNativeMap"/>
+            </feature>
+        </config-file>
+        <header-file src="src/ios/CDVNativeMap.h" />
+        <source-file src="src/ios/CDVNativeMap.m" />
+        <resource-file src="src/ios/img/icon_abri.png" />
+        <resource-file src="src/ios/img/icon_acces.png" />
+        <resource-file src="src/ios/img/icon_atterrissage.png" />
+        <resource-file src="src/ios/img/icon_bisse.png" />
+        <resource-file src="src/ios/img/icon_bivouac.png" />
+        <resource-file src="src/ios/img/icon_camp.png" />
+        <resource-file src="src/ios/img/icon_camping.png" />
+        <resource-file src="src/ios/img/icon_canyon.png" />
+        <resource-file src="src/ios/img/icon_cascade.png" />
+        <resource-file src="src/ios/img/icon_col.png" />
+        <resource-file src="src/ios/img/icon_decollage.png" />
+        <resource-file src="src/ios/img/icon_escalade.png" />
+        <resource-file src="src/ios/img/icon_gite.png" />
+        <resource-file src="src/ios/img/icon_grotte.png" />
+        <resource-file src="src/ios/img/icon_lac.png" />
+        <resource-file src="src/ios/img/icon_lieu.png" />
+        <resource-file src="src/ios/img/icon_meteo.png" />
+        <resource-file src="src/ios/img/icon_produit.png" />
+        <resource-file src="src/ios/img/icon_refuge.png" />
+        <resource-file src="src/ios/img/icon_sae.png" />
+        <resource-file src="src/ios/img/icon_sommet.png" />
+        <resource-file src="src/ios/img/icon_source.png" />
+        <resource-file src="src/ios/img/icon_virtuel.png" />
+        <resource-file src="src/ios/img/icon_webcam.png" />    
+        <resource-file src="src/ios/img/icon_itineraire.png" />
+        <resource-file src="src/ios/img/icon_misc.png" />  
+        <resource-file src="src/ios/img/bubble.9.png" />
+        <resource-file src="src/ios/img/btn_moreinfo.png" />
+        <resource-file src="src/ios/img/icon_myposition.png" /> 
+    </platform>
+    <!-- <uses-permission android:name="android.permission.CLEAR_APP_CACHE"/> -->
+    <!--
+ <framework src="src/android/rules.gradle" custom="true" type="gradleReference" />
+    -->
 </plugin>
