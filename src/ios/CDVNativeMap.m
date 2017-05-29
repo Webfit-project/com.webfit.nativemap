@@ -1,7 +1,7 @@
 #import "CDVNativeMap.h"
 #import <Cordova/CDV.h>
 
-@implementation NativeMap
+@implementation CDVNativeMap
 
 - (void)startMap:(CDVInvokedUrlCommand*)command
 {
@@ -14,6 +14,19 @@
         pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR];
     }
 
+    [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+}
+
+- (void)requestWES:(CDVInvokedUrlCommand*)command
+{
+    CDVPluginResult* pluginResult = nil;
+    NSString* cmd = [command.arguments objectAtIndex:0];
+
+    if (cmd != nil && [cmd length] > 0) {
+        pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:cmd];
+    } else {
+        pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR];
+    }
     [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
 }
 

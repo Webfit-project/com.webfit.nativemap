@@ -7,10 +7,11 @@
 #import <Foundation/Foundation.h>
 #import <Cordova/CDV.h>
 
-@interface NativeMap : CDVPlugin
+@interface CDVNativeMap : CDVPlugin
 - (void)startMap:(CDVInvokedUrlCommand*)command;
 - (void)getCacheSize:(CDVInvokedUrlCommand*)command;
 - (void)clearCache:(CDVInvokedUrlCommand*)command;
+- (void)requestWES:(CDVInvokedUrlCommand*)command;
 @end
 
 
