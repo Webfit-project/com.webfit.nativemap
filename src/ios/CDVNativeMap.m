@@ -20,13 +20,9 @@
 - (void)requestWES:(CDVInvokedUrlCommand*)command
 {
     CDVPluginResult* pluginResult = nil;
-    NSString* cmd = [command.arguments objectAtIndex:0];
-
-    if (cmd != nil && [cmd length] > 0) {
-        pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:cmd];
-    } else {
-        pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR];
-    }
+   
+    pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:cmd];
+   
     [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
 }
 
