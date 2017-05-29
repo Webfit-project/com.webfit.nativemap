@@ -1,0 +1,23 @@
+{
+  "name": "cordova-nativemap",
+  "version": "0.0.1",
+  "description": "Cordova plugin native map",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Webfit-project/com.webfit.nativemap"
+  },
+  "keywords": [
+    "cordova",
+    "plugin",
+    "map",
+    "native",
+    "ios",
+    "android"
+  ],
+  "author": "Webfit - https://www.webfit.fr",
+  "license": "Apache2",
+  "bugs": {
+    "url": "https://github.com/Webfit-project/random_string_detection/issues"
+  },
+  "homepage": "https://github.com/Webfit-project/com.webfit.nativemap"
+}
