@@ -60,16 +60,46 @@
             <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
         </config-file>
     </platform>
-    <!-- <uses-permission android:name="android.permission.CLEAR_APP_CACHE"/> -->
-    <!--
- <framework src="src/android/rules.gradle" custom="true" type="gradleReference" />
     <platform name="ios">
         <config-file target="config.xml" parent="/*">
             <feature name="Device">
-                <param name="ios-package" value="CDVDevice"/>
+                <param name="ios-package" value="CDVNativeMap"/>
             </feature>
         </config-file>
-        <header-file src="src/ios/CDVDevice.h" />
-        <source-file src="src/ios/CDVDevice.m" />
-    </platform>-->
+        <header-file src="src/ios/CDVNativeMap.h" />
+        <source-file src="src/ios/CDVNativeMap.m" />
+        <resource-file src="src/android/img/icon_abri.png" />
+        <source-file src="src/android/img/icon_acces.png" />
+        <source-file src="src/android/img/icon_atterrissage.png" />
+        <source-file src="src/android/img/icon_bisse.png" />
+        <source-file src="src/android/img/icon_bivouac.png" />
+        <source-file src="src/android/img/icon_camp.png" />
+        <source-file src="src/android/img/icon_camping.png" />
+        <source-file src="src/android/img/icon_canyon.png" />
+        <source-file src="src/android/img/icon_cascade.png" />
+        <source-file src="src/android/img/icon_col.png" />
+        <source-file src="src/android/img/icon_decollage.png" />
+        <source-file src="src/android/img/icon_escalade.png" />
+        <source-file src="src/android/img/icon_gite.png" />
+        <source-file src="src/android/img/icon_grotte.png" />
+        <source-file src="src/android/img/icon_lac.png" />
+        <source-file src="src/android/img/icon_lieu.png" />
+        <source-file src="src/android/img/icon_meteo.png" />
+        <source-file src="src/android/img/icon_produit.png" />
+        <source-file src="src/android/img/icon_refuge.png" />
+        <source-file src="src/android/img/icon_sae.png" />
+        <source-file src="src/android/img/icon_sommet.png" />
+        <source-file src="src/android/img/icon_source.png" />
+        <source-file src="src/android/img/icon_virtuel.png" />
+        <source-file src="src/android/img/icon_webcam.png" />    
+        <source-file src="src/android/img/icon_itineraire.png" />
+        <source-file src="src/android/img/icon_misc.png" />  
+        <source-file src="src/android/img/bubble.9.png" />
+        <source-file src="src/android/img/btn_moreinfo.png" />
+        <source-file src="src/android/img/icon_myposition.png" /> 
+    </platform>
+    <!-- <uses-permission android:name="android.permission.CLEAR_APP_CACHE"/> -->
+    <!--
+ <framework src="src/android/rules.gradle" custom="true" type="gradleReference" />
+    -->
 </plugin>
