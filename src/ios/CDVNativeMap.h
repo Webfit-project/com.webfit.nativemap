@@ -7,18 +7,27 @@
 #import <Foundation/Foundation.h>
 #import <Cordova/CDV.h>
 
-@interface CDVNativeMap : CDVPlugin
-@property (nonatomic, retain) UIView* childView;
+#import "RMMapView.h"
+
+
+@interface CDVNativeMap : CDVPlugin <RMMapViewDelegate> {
+    RMMapView *mapView;
+    
+    // Your own code....
+}
+@property (nonatomic, assign) IBOutlet CDVInvokedUrlCommand* cmddone;
+@property (nonatomic, strong) IBOutlet UIToolbar* toolbar;
+@property (nonatomic, strong) IBOutlet UIToolbar* bgToolbar;
+@property (nonatomic, retain) IBOutlet RMMapView *mapView;
+- (IBAction)doneButton:(id)sender;
 - (void)startMap:(CDVInvokedUrlCommand*)command;
 - (void)getCacheSize:(CDVInvokedUrlCommand*)command;
 - (void)clearCache:(CDVInvokedUrlCommand*)command;
 - (void)requestWES:(CDVInvokedUrlCommand*)command;
+- (void)createView;
+
+
 @end
 
 
-#ifndef CDVNativeMap_h
 
-#define CDVNativeMap_h
-
-
-#endif /* CDVNativeMap_h */
