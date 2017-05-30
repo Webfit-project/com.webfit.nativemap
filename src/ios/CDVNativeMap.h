@@ -8,6 +8,7 @@
 #import <Cordova/CDV.h>
 
 @interface CDVNativeMap : CDVPlugin
+@property (nonatomic, retain) UIView* childView;
 - (void)startMap:(CDVInvokedUrlCommand*)command;
 - (void)getCacheSize:(CDVInvokedUrlCommand*)command;
 - (void)clearCache:(CDVInvokedUrlCommand*)command;

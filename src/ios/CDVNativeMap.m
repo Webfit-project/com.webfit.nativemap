@@ -3,6 +3,18 @@
 
 @implementation CDVNativeMap
 
+@synthesize childView;
+
+- (void)pluginInitialize
+{
+
+}
+- (void)createView
+{
+
+}
+
+
 - (void)startMap:(CDVInvokedUrlCommand*)command
 {
     CDVPluginResult* pluginResult = nil;
@@ -21,7 +33,7 @@
 {
     CDVPluginResult* pluginResult = nil;
    
-    pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:cmd];
+    pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
    
     [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
 }
