@@ -96,7 +96,9 @@
         <resource-file src="src/ios/img/icon_misc.png" />  
         <resource-file src="src/ios/img/bubble.9.png" />
         <resource-file src="src/ios/img/btn_moreinfo.png" />
-        <resource-file src="src/ios/img/icon_myposition.png" /> 
+        <resource-file src="src/ios/img/icon_myposition.png" />
+        <resource-file src="src/ios/img/backbutton.png" /> 
+        <resource-file src="src/ios/img/logo.png" /> 
     </platform>
     <!-- <uses-permission android:name="android.permission.CLEAR_APP_CACHE"/> -->
     <!--
