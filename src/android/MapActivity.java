@@ -29,7 +29,7 @@ import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.ionicframework.camptocamp893008.R;
+import com.webfit.camptocamp.R;
 
 import org.json.JSONArray;
 import org.json.JSONException;
