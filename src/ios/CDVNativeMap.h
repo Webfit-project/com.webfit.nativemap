@@ -19,15 +19,13 @@
 @property (nonatomic, strong) IBOutlet UIToolbar* toolbar;
 @property (nonatomic, strong) IBOutlet UIToolbar* bgToolbar;
 @property (nonatomic, retain) IBOutlet RMMapView *mapView;
+@property (nonatomic, retain) IBOutlet UITextView *infoTextView;
 - (IBAction)doneButton:(id)sender;
 - (void)startMap:(CDVInvokedUrlCommand*)command;
 - (void)getCacheSize:(CDVInvokedUrlCommand*)command;
 - (void)clearCache:(CDVInvokedUrlCommand*)command;
 - (void)requestWES:(CDVInvokedUrlCommand*)command;
-- (void)createView;
-
+- (void)createView:(CDVInvokedUrlCommand*)command;
+- (void)updateInfo;
 
 @end
-
-
-
