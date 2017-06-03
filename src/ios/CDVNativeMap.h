@@ -27,5 +27,10 @@
 - (void)requestWES:(CDVInvokedUrlCommand*)command;
 - (void)createView:(CDVInvokedUrlCommand*)command;
 - (void)updateInfo;
+- (void)addMarkers:(double)lat :(double)lon :(NSString*)title :(NSString*)description :(NSString*)ido :(NSString*)icon;
+-(UIImage *)imageResize :(UIImage*)img andResizeTo:(CGSize)newSize;
 
 @end
+
+
+
