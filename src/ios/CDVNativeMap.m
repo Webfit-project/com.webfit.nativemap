@@ -8,7 +8,7 @@
 #import "RMProjection.h"
 #import "RMAnnotation.h"
 #import "RMQuadTree.h"
-#import "RMShape.h"ƒ
+#import "RMShape.h"
 #import "RMCoordinateGridSource.h"
 #import "RMOpenCycleMapSource.h"
 
@@ -16,9 +16,11 @@
     CLLocationCoordinate2D center;
     BOOL tapped;
     NSUInteger tapCount;
+    NSString *callbackId;
 }
 @synthesize mapView;
 @synthesize infoTextView;
+@synthesize callbackId;
 #define kCircleAnnotationType @"circleAnnotation"
 #define kDraggableAnnotationType @"draggableAnnotation"
 
@@ -40,7 +42,7 @@
     NSMutableArray *centerCoord = [NSJSONSerialization JSONObjectWithData:[[command argumentAtIndex:0] dataUsingEncoding:NSUTF8StringEncoding] options:NSJSONReadingMutableContainers error:&error];
     
     double zoomLevel = [[command argumentAtIndex:4] doubleValue];
-
+    
     
     
     
@@ -66,7 +68,7 @@
     
     mapView.enableBouncing = NO;
     mapView.enableDragging = YES;
-
+    
     UIImage *clusterMarkerImage = [UIImage imageNamed:@"marker-blue.png"];
     mapView.clusterMarkerSize = clusterMarkerImage.size;
     mapView.clusterAreaSize = CGSizeMake(clusterMarkerImage.size.width * 1.25, clusterMarkerImage.size.height * 1.25);
@@ -100,7 +102,7 @@
     
     UIImage *logoimg = [[UIImage imageNamed:@("logo.png")] imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal];
     
-    UIBarItem *logo= [[UIBarButtonItem alloc] initWithImage:logoimg style:nil target:self action:nil];
+    UIBarItem *logo= [[UIBarButtonItem alloc] initWithImage:logoimg style:UIBarButtonItemStyleDone target:self action:nil];
     
     UIImage *backbuttonimg = [[UIImage imageNamed:@("backbutton.png")] imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal];
     
@@ -186,14 +188,14 @@
             [(RMMarker *)marker setIdo:annotation.ido];
         
         /*
-        if (annotation.title)
-            [(RMMarker *)marker changeLabelUsingText:annotation.title];
-        
-        if ([annotation.userInfo objectForKey:@"foregroundColor"])
-            [(RMMarker *)marker setTextForegroundColor:[annotation.userInfo objectForKey:@"foregroundColor"]];
-        
-        if ([annotation.annotationType isEqualToString:kDraggableAnnotationType])
-            marker.enableDragging = YES;
+         if (annotation.title)
+         [(RMMarker *)marker changeLabelUsingText:annotation.title];
+         
+         if ([annotation.userInfo objectForKey:@"foregroundColor"])
+         [(RMMarker *)marker setTextForegroundColor:[annotation.userInfo objectForKey:@"foregroundColor"]];
+         
+         if ([annotation.annotationType isEqualToString:kDraggableAnnotationType])
+         marker.enableDragging = YES;
          */
     }
     
@@ -235,7 +237,7 @@
 - (void)addMarkers:(double)lat :(double)lon :(NSString*)title :(NSString*)description :(NSString *)ido :(NSString*)icon
 {
     NSLog(@"on ajoute un marker");
-   
+    
     
     UIImage *MarkerImage;
     
@@ -243,44 +245,44 @@
         MarkerImage = [self imageResize:[UIImage imageNamed:@"icon_sommet.png"] andResizeTo:CGSizeMake(40, 64) ];
     } else if([icon isEqualToString:@"shelter"]) {
         MarkerImage = [self imageResize:[UIImage imageNamed:@"icon_abri.png"] andResizeTo:CGSizeMake(40, 64) ];
-
+        
     } else if([icon isEqualToString:@"access"]) {
         MarkerImage = [self imageResize:[UIImage imageNamed:@"icon_acces.png"] andResizeTo:CGSizeMake(40, 64) ];
-
+        
     } else if([icon isEqualToString:@"paragliding_landing"]) {
         MarkerImage = [self imageResize:[UIImage imageNamed:@"icon_atterrissage.png"] andResizeTo:CGSizeMake(40, 64) ];
-
+        
     } else if([icon isEqualToString:@"bisse"]) {
         MarkerImage = [self imageResize:[UIImage imageNamed:@"icon_bisse.png"] andResizeTo:CGSizeMake(40, 64) ];
-
+        
     } else if([icon isEqualToString:@"bivouac"]) {
         MarkerImage = [self imageResize:[UIImage imageNamed:@"icon_bivouac.png"] andResizeTo:CGSizeMake(40, 64) ];
     } else if([icon isEqualToString:@"base_camp"]) {
         MarkerImage = [self imageResize:[UIImage imageNamed:@"icon_camp.png"] andResizeTo:CGSizeMake(40, 64) ];
-
+        
     } else if([icon isEqualToString:@"camp_site"]) {
         MarkerImage = [self imageResize:[UIImage imageNamed:@"icon_camping.png"] andResizeTo:CGSizeMake(40, 64) ];
-
+        
     } else if([icon isEqualToString:@"canyon"]) {
         MarkerImage = [self imageResize:[UIImage imageNamed:@"icon_canyon.png"] andResizeTo:CGSizeMake(40, 64) ];
-
+        
     } else if([icon isEqualToString:@"waterfall"]) {
         MarkerImage = [self imageResize:[UIImage imageNamed:@"icon_cascade.png"] andResizeTo:CGSizeMake(40, 64) ];
-
+        
     } else if([icon isEqualToString:@"pass"]) {
         MarkerImage = [self imageResize:[UIImage imageNamed:@"icon_col.png"] andResizeTo:CGSizeMake(40, 64) ];
-
+        
     } else if([icon isEqualToString:@"paragliding_takeoff"]) {
         MarkerImage = [self imageResize:[UIImage imageNamed:@"icon_decollage.png"] andResizeTo:CGSizeMake(40, 64) ];
     } else if([icon isEqualToString:@"climbing_outdoor"]) {
         MarkerImage = [self imageResize:[UIImage imageNamed:@"icon_escalade.png"] andResizeTo:CGSizeMake(40, 64) ];
-
+        
     } else if([icon isEqualToString:@"gite"]) {
         MarkerImage = [self imageResize:[UIImage imageNamed:@"icon_gite.png"] andResizeTo:CGSizeMake(40, 64) ];
-
+        
     } else if([icon isEqualToString:@"cave"]) {
         MarkerImage = [self imageResize:[UIImage imageNamed:@"icon_grotte.png"] andResizeTo:CGSizeMake(40, 64) ];
-
+        
     } else if([icon isEqualToString:@"lake"]) {
         MarkerImage = [self imageResize:[UIImage imageNamed:@"icon_lac.png"] andResizeTo:CGSizeMake(40, 64) ];
     } else if([icon isEqualToString:@"locality"]) {
@@ -309,31 +311,31 @@
     
     
     
-            
+    
     CLLocationCoordinate2D markerPosition;
     markerPosition.latitude = lat;
     markerPosition.longitude = lon;
     
     RMAnnotation *annotation = [RMAnnotation annotationWithMapView:mapView coordinate:markerPosition andTitle:nil];
- 
+    
     annotation.annotationIcon = MarkerImage;
     annotation.title = title;
     annotation.desc = description;
     annotation.ido = ido;
     annotation.anchorPoint = CGPointMake(0.5, 1.0);
-
+    
     [mapView addAnnotation:annotation];
     
     
     /*
-    trace un cercle
+     trace un cercle
      RMAnnotation *circleAnnotation = [RMAnnotation annotationWithMapView:mapView coordinate:CLLocationCoordinate2DMake(47.4, 10.0) andTitle:@"A Circle"];
-    circleAnnotation.annotationType = kCircleAnnotationType;
-    [mapView addAnnotation:circleAnnotation];
-    */
+     circleAnnotation.annotationType = kCircleAnnotationType;
+     [mapView addAnnotation:circleAnnotation];
+     */
     
     NSLog(@"fin ajout marker");
-
+    
 }
 
 
@@ -353,16 +355,16 @@
 - (void)updateInfo
 {
     
-     CLLocationCoordinate2D mapCenter = [mapView centerCoordinate];
-     
-     [infoTextView setText:[NSString stringWithFormat:@"Longitude : %f\nLatitude : %f\nZoom level : %.2f\nScale : 1:%.0f\n%@",
-     mapCenter.longitude,
-     mapCenter.latitude,
-     mapView.zoom,
-     mapView.scaleDenominator,
-     [[mapView tileSource] shortAttribution]
-     ]];
-     /*
+    CLLocationCoordinate2D mapCenter = [mapView centerCoordinate];
+    
+    [infoTextView setText:[NSString stringWithFormat:@"Longitude : %f\nLatitude : %f\nZoom level : %.2f\nScale : 1:%.0f\n%@",
+                           mapCenter.longitude,
+                           mapCenter.latitude,
+                           mapView.zoom,
+                           mapView.scaleDenominator,
+                           [[mapView tileSource] shortAttribution]
+                           ]];
+    /*
      [mppLabel setText:[NSString stringWithFormat:@"%.0f m", mapView.metersPerPixel * mppImage.bounds.size.width]];
      */
 }
@@ -378,11 +380,14 @@
     pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
     
     
-    //	 [self.commandDelegate sendPluginResult:pluginResult callbackId:self.cmddone.callbackId];
+    [self.commandDelegate sendPluginResult:pluginResult callbackId:callbackId];
+    
+    [self closeMap];
+}
+- (void)closeMap {
     [ self.mapView removeFromSuperview];
     [ self.bgToolbar removeFromSuperview];
     [ self.toolbar removeFromSuperview];
-    
 }
 - (void)startMap:(CDVInvokedUrlCommand*)command
 {
@@ -401,7 +406,7 @@
     
     
     
-    self.cmddone = command;
+    callbackId = command.callbackId;
     [self createView:command];
     
 }
@@ -491,71 +496,62 @@
     return NO;
 }
 
-- (void)mapView:(RMMapView *)map didDragAnnotation:(RMAnnotation *)annotation withDelta:(CGPoint)delta
+
+- (void)tapOnButton:(NSString *)name
 {
-    CGPoint screenPosition = CGPointMake(annotation.position.x - delta.x, annotation.position.y - delta.y);
+    CDVPluginResult* pluginResult = nil;
+    pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:name];
     
-    annotation.coordinate = [mapView pixelToCoordinate:screenPosition];
-    annotation.position = screenPosition;
+    [self.commandDelegate sendPluginResult:pluginResult callbackId:callbackId];
+    [self closeMap];
 }
 
-- (void)mapView:(RMMapView *)map didEndDragAnnotation:(RMAnnotation *)annotation
-{
-    RMProjectedPoint projectedPoint = annotation.projectedLocation;
-    CGPoint screenPoint = annotation.position;
-    
-    NSLog(@"Did end dragging marker, screen: {%.0f,%.0f}, projected: {%f,%f}, coordinate: {%f,%f}", screenPoint.x, screenPoint.y, projectedPoint.x, projectedPoint.y, annotation.coordinate.latitude, annotation.coordinate.longitude);
-}
 
 - (void)tapOnLabelForAnnotation:(RMAnnotation *)annotation onMap:(RMMapView *)map
 {
-   
-        NSLog(@"Label tapped for marker on sait pas lequel");
-    
-    /* [(RMMarker *)annotation.layer changeLabelUsingText:[NSString stringWithFormat:@"Drag me! Tap me! (%d)", ++tapCount]]; */
-    
+    [(RMMarker *)annotation.layer hideLabel];
 }
 
 - (void)singleTapOnMap:(RMMapView *)map at:(CGPoint)point
 {
     /*
-    RMProjectedPoint projectedPoint = [map pixelToProjectedPoint:point];
-    CLLocationCoordinate2D coordinates =  [map pixelToCoordinate:point];
-    
-    NSLog(@"Clicked on Map - Location: x:%lf y:%lf, Projected east:%f north:%f, Coordinate lat:%f lon:%f", point.x, point.y, projectedPoint.x, projectedPoint.y, coordinates.latitude, coordinates.longitude);
+     RMProjectedPoint projectedPoint = [map pixelToProjectedPoint:point];
+     CLLocationCoordinate2D coordinates =  [map pixelToCoordinate:point];
+     
+     NSLog(@"Clicked on Map - Location: x:%lf y:%lf, Projected east:%f north:%f, Coordinate lat:%f lon:%f", point.x, point.y, projectedPoint.x, projectedPoint.y, coordinates.latitude, coordinates.longitude);
      */
 }
 
 - (void)tapOnAnnotation:(RMAnnotation *)annotation onMap:(RMMapView *)map
 {
     NSLog(@"taponannotation");
-   
-    [(RMMarker *)annotation.layer createInfoWindow:annotation.title desc:annotation.desc ido:annotation.ido];
-/*
     
-    if ([annotation.annotationType isEqualToString:kRMClusterAnnotationTypeName])
-    {
-        [map zoomInToNextNativeZoomAt:[map coordinateToPixel:annotation.coordinate] animated:YES];
-    }
-    else if ([annotation.annotationType isEqualToString:kDraggableAnnotationType])
-    {
-        NSLog(@"MARKER TAPPED!");
-        
-        if (!tapped)
-        {
-            annotation.annotationIcon = [UIImage imageNamed:@"marker-red.png"];
-            [(RMMarker *)annotation.layer replaceUIImage:annotation.annotationIcon anchorPoint:annotation.anchorPoint];
-            [(RMMarker *)annotation.layer changeLabelUsingText:@"Hello"];
-            tapped = YES;
-        }
-        else
-        {
-            annotation.annotationIcon = [UIImage imageNamed:@"marker-blue.png"];
-            [(RMMarker *)annotation.layer replaceUIImage:annotation.annotationIcon anchorPoint:annotation.anchorPoint];
-            [(RMMarker *)annotation.layer changeLabelUsingText:@"World"];
-            tapped = NO;
-        }
-    }
- */
+    [(RMMarker *)annotation.layer createInfoWindow:annotation.title desc:annotation.desc ido:annotation.ido];
+    /*
+     
+     if ([annotation.annotationType isEqualToString:kRMClusterAnnotationTypeName])
+     {
+     [map zoomInToNextNativeZoomAt:[map coordinateToPixel:annotation.coordinate] animated:YES];
+     }
+     else if ([annotation.annotationType isEqualToString:kDraggableAnnotationType])
+     {
+     NSLog(@"MARKER TAPPED!");
+     
+     if (!tapped)
+     {
+     annotation.annotationIcon = [UIImage imageNamed:@"marker-red.png"];
+     [(RMMarker *)annotation.layer replaceUIImage:annotation.annotationIcon anchorPoint:annotation.anchorPoint];
+     [(RMMarker *)annotation.layer changeLabelUsingText:@"Hello"];
+     tapped = YES;
+     }
+     else
+     {
+     annotation.annotationIcon = [UIImage imageNamed:@"marker-blue.png"];
+     [(RMMarker *)annotation.layer replaceUIImage:annotation.annotationIcon anchorPoint:annotation.anchorPoint];
+     [(RMMarker *)annotation.layer changeLabelUsingText:@"World"];
+     tapped = NO;
+     }
+     }
+     */
 }
 @end

@@ -20,6 +20,7 @@
 @property (nonatomic, strong) IBOutlet UIToolbar* bgToolbar;
 @property (nonatomic, retain) IBOutlet RMMapView *mapView;
 @property (nonatomic, retain) IBOutlet UITextView *infoTextView;
+@property (nonatomic, retain) IBOutlet NSString *callbackId;
 - (IBAction)doneButton:(id)sender;
 - (void)startMap:(CDVInvokedUrlCommand*)command;
 - (void)getCacheSize:(CDVInvokedUrlCommand*)command;
