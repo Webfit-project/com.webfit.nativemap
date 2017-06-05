@@ -21,7 +21,12 @@
 @property (nonatomic, retain) IBOutlet RMMapView *mapView;
 @property (nonatomic, retain) IBOutlet UITextView *infoTextView;
 @property (nonatomic, retain) IBOutlet NSString *callbackId;
+@property (nonatomic, retain) IBOutlet RMMapLayer *myroute;
+@property (nonatomic, retain) IBOutlet NSMutableArray *myrouteCoord;
+
 - (IBAction)doneButton:(id)sender;
+- (void)createRoute;
++ (void)drawRoute;
 - (void)startMap:(CDVInvokedUrlCommand*)command;
 - (void)getCacheSize:(CDVInvokedUrlCommand*)command;
 - (void)clearCache:(CDVInvokedUrlCommand*)command;

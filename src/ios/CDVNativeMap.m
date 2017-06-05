@@ -1,10 +1,11 @@
 #import "CDVNativeMap.h"
 #import <Cordova/CDV.h>
 #import "RMOpenStreetMapSource.h"
-#import "RMOpenSeaMapLayer.h"
+#import "RMESRIWorldTopoMap.h"
 #import "RMMapView.h"
 #import "RMMarker.h"
 #import "RMCircle.h"
+#import "RMPath.h"
 #import "RMProjection.h"
 #import "RMAnnotation.h"
 #import "RMQuadTree.h"
@@ -21,6 +22,8 @@
 @synthesize mapView;
 @synthesize infoTextView;
 @synthesize callbackId;
+@synthesize myroute;
+@synthesize myrouteCoord;
 #define kCircleAnnotationType @"circleAnnotation"
 #define kDraggableAnnotationType @"draggableAnnotation"
 
@@ -38,16 +41,45 @@
 
 - (void)createView:(CDVInvokedUrlCommand*)command
 {
+    
+    [[NSNotificationCenter 	defaultCenter] addObserver:self selector:@selector(getNewLocation:) name:@"getnewlocation" object:nil];
+
     NSError *error;
     NSMutableArray *centerCoord = [NSJSONSerialization JSONObjectWithData:[[command argumentAtIndex:0] dataUsingEncoding:NSUTF8StringEncoding] options:NSJSONReadingMutableContainers error:&error];
+    
+    center.latitude = [[centerCoord valueForKey:@"lat"] doubleValue];
+    center.longitude = [[centerCoord valueForKey:@"lon"] doubleValue];
+    
+    
+    myrouteCoord = [[NSMutableArray alloc] init];
+    
+
+    NSLog(@"on parse: %@", [command argumentAtIndex:3]);
+
+    NSData *jsonobj = [NSKeyedArchiver archivedDataWithRootObject:[command argumentAtIndex:3]];
+    
+    NSDictionary *myrouteFromWV = [NSJSONSerialization JSONObjectWithData:jsonobj options:NSJSONReadingMutableContainers error:&error];
+    
+    
+   NSArray *coordsList = [myrouteFromWV objectForKey:@"list"];
+    NSLog(@"on verifie le nb de coordonnée deja enregistré: %i", [coordsList count]);
+    for(int n = 0;n < [coordsList count];n++) {
+        
+        double lat = [[coordsList[n] valueForKey:@"lat"] doubleValue];
+        double lon = [[coordsList[n] valueForKey:@"lon"] doubleValue];
+        NSLog(@"on rajoute les coordonnées: %@,%@",[coordsList[n] valueForKey:@"lat"],[coordsList[n] valueForKey:@"lon"]);
+        [myrouteCoord addObject:[[CLLocation alloc] initWithLatitude:lat longitude:lon]];
+        
+    }
+    
     
     double zoomLevel = [[command argumentAtIndex:4] doubleValue];
     
     
     
     
-    center.latitude = [[centerCoord valueForKey:@"lat"] doubleValue];
-    center.longitude = [[centerCoord valueForKey:@"lon"] doubleValue];
+    
+
     
     CGRect bounds = [[UIScreen mainScreen] bounds];
     mapView.maxZoom = 12.5f;
@@ -117,7 +149,8 @@
     
     
     
-    [mapView setTileSources:@[[[RMOpenStreetMapSource alloc] init]]];
+   // [mapView setTileSources:@[[[RMOpenStreetMapSource alloc] init]]];
+    [mapView setTileSources:@[[[RMOESRIWorldTopoMap alloc] init]]];
     [self.mapView setBackgroundColor:[UIColor greenColor]];
     // [[self view] addSubview:mapView];
     //
@@ -154,7 +187,8 @@
     
     [self updateInfo];
     [self performSelector:@selector(createWaypoints:) withObject:[command argumentAtIndex:1] afterDelay:1];
-    
+    //[self performSelector:@selector(drawRoute:) withObject:nil afterDelay: 10];
+   // [self performSelector:@selector(createRoute:) withObject:nil afterDelay: 1];
 }
 
 //-(IBAction)doneButton:(id)sender
@@ -174,6 +208,28 @@
         marker = [[RMCircle alloc] initWithView:aMapView radiusInMeters:10000.0];
         [(RMCircle *)marker setLineWidthInPixels:5.0];
     }
+    else if([annotation.annotationType isEqualToString:@"path"])
+    {
+        marker = [[RMShape alloc] initWithView:aMapView];
+        
+        
+        [(RMShape *)marker setLineWidth:4.0];
+        [(RMShape *)marker setLineColor:[UIColor colorWithRed:250.0f/255.0f green:225.0f/255.0f blue:72.0f/255.0f alpha:0.79f]];
+        myroute = marker;
+        NSLog(@"on verifie s'il y a deja un chemon qui a été parcouru");
+        for(int n=0;n<[myrouteCoord count];n++)
+        {
+            NSLog(@"on rajoute une coordonnée déja parcouru %i",n);
+            double lat = [[myrouteCoord[n] valueForKey:@"lat"] doubleValue];
+            double lon = [[myrouteCoord[n] valueForKey:@"lon"] doubleValue];
+            [(RMShape *)myroute addLineToCoordinate:CLLocationCoordinate2DMake(lat,lon)];
+            
+        }
+        
+      //  [self drawRoute];
+        
+    }
+
     else
     {
         marker = [[RMMarker alloc] initWithUIImage:annotation.annotationIcon anchorPoint:annotation.anchorPoint];
@@ -204,6 +260,7 @@
 
 - (void)createWaypoints:(NSString*)json
 {
+    [self createRoute];
     NSError *error;
     NSDictionary *iconList = [NSJSONSerialization JSONObjectWithData:[json dataUsingEncoding:NSUTF8StringEncoding] options:NSJSONReadingMutableContainers error:&error];
     
@@ -370,7 +427,6 @@
 }
 
 
-
 -(IBAction)doneButton:(id)sender
 {
     CDVPluginResult* pluginResult = nil;
@@ -389,6 +445,60 @@
     [ self.bgToolbar removeFromSuperview];
     [ self.toolbar removeFromSuperview];
 }
+- (void)createRoute {
+    RMAnnotation *pathAnnotation = [RMAnnotation annotationWithMapView:mapView coordinate:center andTitle:@"A Circle"];
+    pathAnnotation.annotationType = @"path";
+
+    /*
+    
+    [myrouteCoord addObject:[[CLLocation alloc] initWithLatitude:0.0f longitude:0.0f]];
+    [myrouteCoord addObject:[[CLLocation alloc] initWithLatitude:0.0f longitude:2.0f]];
+    [myrouteCoord addObject:[[CLLocation alloc] initWithLatitude:1.0f longitude:3.0f]];
+    [myrouteCoord addObject:[[CLLocation alloc] initWithLatitude:2.0f longitude:1.0f]];
+     */
+//     currentLongitude = currentLocation.coordinate.longitude;]
+    [pathAnnotation setBoundingBoxFromLocations:myrouteCoord];
+    
+    
+    [mapView addAnnotation:pathAnnotation];
+}
+- (void)getNewLocation:(NSNotification*)notification {
+    NSDictionary* userInfo = notification.userInfo;
+    
+    NSString *latitude = (NSString*)userInfo[@"latitude"];
+    NSString *longitude = (NSString*)userInfo[@"longitude"];
+    [myrouteCoord addObject:[[CLLocation alloc] initWithLatitude:[latitude doubleValue] longitude:[longitude doubleValue]]];
+                             
+    [(RMShape *)myroute addLineToCoordinate:CLLocationCoordinate2DMake([latitude doubleValue],[longitude doubleValue])];
+    
+    NSLog (@"nouvelle coordonnée : (%@,%@)", latitude,longitude);
+}
+
+- (void)drawRoute {
+    
+    
+    [(RMPath *)myroute addLineToCoordinate:CLLocationCoordinate2DMake(0.0f,0.0f)];
+    [(RMPath *)myroute addLineToCoordinate:CLLocationCoordinate2DMake(0.0f, 2.0f)];
+    
+    [(RMPath *)myroute addLineToCoordinate:CLLocationCoordinate2DMake(1.0f, 3.0f)];
+    
+ [(RMPath *)myroute addLineToCoordinate:CLLocationCoordinate2DMake(2.0f, 1.0f)];
+   
+    
+    /*
+    RMAnnotation *circleAnnotation = [RMAnnotation annotationWithMapView:mapView coordinate:CLLocationCoordinate2DMake(47.4, 10.0) andTitle:@"A Circle"];
+    circleAnnotation.annotationType = kCircleAnnotationType;
+    [mapView addAnnotation:circleAnnotation];
+    */
+    
+    /*
+    [(RMPath *)pathAnnotation addLineToProjectedPoint:RMProjectedPointMake(30, 60)];
+    [(RMPath *)pathAnnotation addLineToProjectedPoint:RMProjectedPointMake(50, 200)];
+     */
+    
+}
+
+
 - (void)startMap:(CDVInvokedUrlCommand*)command
 {
     /*
@@ -447,6 +557,7 @@
 }
 - (void)dealloc
 {
+     [[NSNotificationCenter defaultCenter] removeObserver:self];
     if (self.mapView)
     {
         
@@ -464,6 +575,7 @@
         
         self.bgToolbar = nil;
     }
+   
 }
 
 #pragma mark -
