@@ -21,8 +21,11 @@
 @property (nonatomic, retain) IBOutlet RMMapView *mapView;
 @property (nonatomic, retain) IBOutlet UITextView *infoTextView;
 @property (nonatomic, retain) IBOutlet NSString *callbackId;
+@property (nonatomic,retain) IBOutlet RMMapLayer *route;
+@property (nonatomic, retain) IBOutlet NSMutableArray *routeCoord;
 @property (nonatomic, retain) IBOutlet RMMapLayer *myroute;
 @property (nonatomic, retain) IBOutlet NSMutableArray *myrouteCoord;
+@property (nonatomic, retain) IBOutlet RMAnnotation *myposition;
 
 - (IBAction)doneButton:(id)sender;
 - (void)createRoute;
