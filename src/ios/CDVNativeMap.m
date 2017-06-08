@@ -27,6 +27,9 @@
 @synthesize route;
 @synthesize routeCoord;
 @synthesize myposition;
+@synthesize pathmyroute;
+@synthesize infollow;
+
 #define kCircleAnnotationType @"circleAnnotation"
 #define kDraggableAnnotationType @"draggableAnnotation"
 
@@ -55,7 +58,6 @@
     
     routeCoord = [[NSMutableArray alloc] init];
     
-    //   if([[[command argumentAtIndex:2] class] isEqualToString:@"__NSDictionaryM"])
     if ([[command argumentAtIndex:2] isKindOfClass:[NSDictionary class]])
     {
         NSArray *routeList = [[command argumentAtIndex:2] valueForKey:@"list"];
@@ -69,9 +71,9 @@
         }
     }
     
+    infollow = false;
     myrouteCoord = [[NSMutableArray alloc] init];
-    // if([[[command argumentAtIndex:3] class] isEqualToString:@"__NSDictionaryM"])
-    //  {
+    
     if ([[command argumentAtIndex:3] isKindOfClass:[NSDictionary class]])
     {
         NSArray *myrouteList = [[command argumentAtIndex:3] valueForKey:@"list"];
@@ -101,15 +103,12 @@
     [mapView setZoom:zoomLevel];
     [mapView setCenterCoordinate:center animated:NO];
     mapView.adjustTilesForRetinaDisplay = YES;
-    //   mapView.decelerationMode = RMMapDecelerationOff;
+    //mapView.decelerationMode = RMMapDecelerationOff;
     mapView.decelerationMode = RMMapDecelerationNormal;
     
     mapView.enableBouncing = NO;
     mapView.enableDragging = YES;
     
-    UIImage *clusterMarkerImage = [UIImage imageNamed:@"marker-blue.png"];
-    mapView.clusterMarkerSize = clusterMarkerImage.size;
-    mapView.clusterAreaSize = CGSizeMake(clusterMarkerImage.size.width * 1.25, clusterMarkerImage.size.height * 1.25);
     
     //  mapView.debugTiles = YES;
     
@@ -139,32 +138,48 @@
     UIBarButtonItem *flexibleSpace =  [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil];
     
     UIImage *logoimg = [[UIImage imageNamed:@("logo.png")] imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal];
+    UIBarItem *logo = [[UIBarButtonItem alloc] initWithImage:logoimg style:UIBarButtonItemStyleDone target:self action:nil];
     
-    UIBarItem *logo= [[UIBarButtonItem alloc] initWithImage:logoimg style:UIBarButtonItemStyleDone target:self action:nil];
+    
+    
     
     UIImage *backbuttonimg = [[UIImage imageNamed:@("backbutton.png")] imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal];
+    UIBarButtonItem *backbutton = [[UIBarButtonItem alloc] initWithImage:backbuttonimg style:UIBarButtonItemStylePlain target:self action:@selector(doneButton:)];
+    UIBarButtonItem *separator = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFixedSpace target:nil action:nil];
+    separator.width = 15;
     
+    [backbutton setWidth: 30];
     
-    UIBarButtonItem *backbutton= [[UIBarButtonItem alloc] initWithImage:backbuttonimg style:UIBarButtonItemStylePlain target:self action:@selector(doneButton:)];
-    
-    
-    
-    NSArray *toolbarItems = [NSArray arrayWithObjects:backbutton,logo,flexibleSpace, flexibleSpace, flexibleSpace, nil];
-    
+    NSArray *toolbarItems = [NSArray arrayWithObjects:backbutton,separator,logo,flexibleSpace, nil];
     [self.toolbar setItems:toolbarItems animated:NO];
     
+    if([[command argumentAtIndex:5] isEqualToString:@"1"])
+    {
+        UIImage *buttongeolocimg = [[UIImage imageNamed:@("ic_follow_me.png")] imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal];
+        
+        self.buttongeoloc = [UIButton buttonWithType:UIButtonTypeRoundedRect];
+        self.buttongeoloc.frame = CGRectMake(self.webView.bounds.size.width - 88, 188, 68, 68);
+        [self.buttongeoloc addTarget:self action:@selector(geolocButton:) forControlEvents:UIControlEventTouchUpInside];
+        [self.buttongeoloc setImage:buttongeolocimg forState:UIControlStateNormal];
+    }
     
     
-    // [mapView setTileSources:@[[[RMOpenStreetMapSource alloc] init]]];
+    if([[command argumentAtIndex:6] isEqualToString:@"1"])
+    {
+        UIImage *buttoncenterimg = [[UIImage imageNamed:@("ic_center_map.png")] imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal];
+        
+        self.buttoncenter = [UIButton buttonWithType:UIButtonTypeRoundedRect];
+        self.buttoncenter.frame = CGRectMake(self.webView.bounds.size.width - 88, 100, 68, 68);
+        [self.buttoncenter addTarget:self action:@selector(centerButton:) forControlEvents:UIControlEventTouchUpInside];
+        [self.buttoncenter setImage:buttoncenterimg forState:UIControlStateNormal];
+    }
+    
+ 
+    
+    
     [mapView setTileSources:@[[[RMOESRIWorldTopoMap alloc] init]]];
     [self.mapView setBackgroundColor:[UIColor greenColor]];
-    // [[self view] addSubview:mapView];
-    //
     
-    //  [self updateInfo];
-    
-    
-    // [self.childView addSubview:self.mapView];
     
     
 				
@@ -188,8 +203,10 @@
     
     [self.webView addSubview:self.mapView];
     [self.webView addSubview:self.bgToolbar];
-    [self.webView addSubview:self.toolbar];
     
+    [self.webView addSubview:self.toolbar];
+    [self.webView addSubview:self.buttoncenter];
+    [self.webView addSubview:self.buttongeoloc];
     
     [self updateInfo];
     [self performSelector:@selector(createRoute:) withObject:nil afterDelay:0.5f];
@@ -251,7 +268,6 @@
     else if([annotation.annotationType isEqualToString:@"myposition"])
     {
         marker = [[RMMarker alloc] initWithUIImage:annotation.annotationIcon anchorPoint:annotation.anchorPoint];
-        // myposition = marker;
         marker.zPosition = 2.0f;
         if(annotation.title)
             [(RMMarker *)marker setTitle:annotation.title];
@@ -271,16 +287,6 @@
         if(annotation.ido)
             [(RMMarker *)marker setIdo:annotation.ido];
         
-        /*
-         if (annotation.title)
-         [(RMMarker *)marker changeLabelUsingText:annotation.title];
-         
-         if ([annotation.userInfo objectForKey:@"foregroundColor"])
-         [(RMMarker *)marker setTextForegroundColor:[annotation.userInfo objectForKey:@"foregroundColor"]];
-         
-         if ([annotation.annotationType isEqualToString:kDraggableAnnotationType])
-         marker.enableDragging = YES;
-         */
     }
     
     return marker;
@@ -477,6 +483,44 @@
      */
 }
 
+-(IBAction)geolocButton:(id)sender
+{
+    
+    if(infollow) {
+        UIImage *buttongeolocimg = [[UIImage imageNamed:@("ic_follow_me.png")] imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal];
+        
+        [self.buttongeoloc setImage:buttongeolocimg forState:UIControlStateNormal];
+        infollow = false;
+        [mapView setShowsUserLocation:false];
+        
+    }
+    else {
+        UIImage *buttongeolocimg = [[UIImage imageNamed:@("ic_follow_me_on.png")] imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal];
+        
+        [self.buttongeoloc setImage:buttongeolocimg forState:UIControlStateNormal];
+        infollow = true;
+        
+        
+        [mapView setUserTrackingMode:RMUserTrackingModeFollowWithHeading];
+        
+    }
+    
+    
+}
+
+-(IBAction)centerButton:(id)sender
+{
+    
+    CLLocation *mrfc;
+    mrfc = [myrouteCoord lastObject];
+    if(mrfc != nil) {
+        [mapView setCenterCoordinate:CLLocationCoordinate2DMake(mrfc.coordinate.latitude, mrfc.coordinate.longitude)];
+        [mapView setZoom:16.0f];
+    }
+    
+    
+    
+}
 
 -(IBAction)doneButton:(id)sender
 {
@@ -495,37 +539,35 @@
     [ self.mapView removeFromSuperview];
     [ self.bgToolbar removeFromSuperview];
     [ self.toolbar removeFromSuperview];
+    [ self.buttoncenter removeFromSuperview];
+    [ self.buttongeoloc removeFromSuperview];
 }
 - (void)createRoute:(NSDictionary *)iconList {
     NSLog(@"on crée les annotations pour les routes");
     
     
-    RMAnnotation *pathAnnotation;
+    
     
     if([myrouteCoord count] > 0)
     {
         CLLocation *mrfc;
         mrfc = [myrouteCoord firstObject];
-        pathAnnotation = [RMAnnotation annotationWithMapView:mapView coordinate:CLLocationCoordinate2DMake(mrfc.coordinate.latitude, mrfc.coordinate.longitude) andTitle:@""];
+        pathmyroute = [RMAnnotation annotationWithMapView:mapView coordinate:CLLocationCoordinate2DMake(mrfc.coordinate.latitude, mrfc.coordinate.longitude) andTitle:@""];
+        pathmyroute.annotationType = @"path";
+        pathmyroute.title = @"my route";
+        [pathmyroute setBoundingBoxFromLocations:myrouteCoord];
+        
+        
+        [mapView addAnnotation:pathmyroute];
         
     }
-    else {
-        pathAnnotation = [RMAnnotation annotationWithMapView:mapView coordinate:center andTitle:@""];
-    }
-    
-   
     
     
-    pathAnnotation.annotationType = @"path";
-    pathAnnotation.title = @"my route";
-    [pathAnnotation setBoundingBoxFromLocations:myrouteCoord];
     
-    
-    [mapView addAnnotation:pathAnnotation];
     
     RMAnnotation *pathAnnotation2;
     
-
+    
     CLLocation *rfc;
     rfc = [routeCoord firstObject];
     pathAnnotation2 = [RMAnnotation annotationWithMapView:mapView coordinate:CLLocationCoordinate2DMake(rfc.coordinate.latitude, rfc.coordinate.longitude) andTitle:@""];
@@ -551,6 +593,22 @@
     if(myposition != nil)
     {
         [myposition setCoordinate:CLLocationCoordinate2DMake([latitude doubleValue], [longitude doubleValue])];
+    }
+    else
+    {
+        //CLLocation *mylocation = [myrouteCoord lastObject];
+        [self addMyPositionMarker:[latitude doubleValue] :[longitude doubleValue]];
+    }
+    
+    if(pathmyroute == nil)
+    {
+        pathmyroute = [RMAnnotation annotationWithMapView:mapView coordinate:CLLocationCoordinate2DMake([latitude doubleValue], [longitude doubleValue]) andTitle:@""];
+        pathmyroute.annotationType = @"path";
+        pathmyroute.title = @"my route";
+        [pathmyroute setBoundingBoxFromLocations:myrouteCoord];
+        
+        
+        [mapView addAnnotation:pathmyroute];
     }
     NSLog (@"nouvelle coordonnée : (%@,%@)", latitude,longitude);
 }

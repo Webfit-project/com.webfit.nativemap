@@ -16,6 +16,7 @@
     // Your own code....
 }
 @property (nonatomic, assign) IBOutlet CDVInvokedUrlCommand* cmddone;
+@property (nonatomic, assign) BOOL infollow;
 @property (nonatomic, strong) IBOutlet UIToolbar* toolbar;
 @property (nonatomic, strong) IBOutlet UIToolbar* bgToolbar;
 @property (nonatomic, retain) IBOutlet RMMapView *mapView;
@@ -26,7 +27,13 @@
 @property (nonatomic, retain) IBOutlet RMMapLayer *myroute;
 @property (nonatomic, retain) IBOutlet NSMutableArray *myrouteCoord;
 @property (nonatomic, retain) IBOutlet RMAnnotation *myposition;
+@property (nonatomic, retain) IBOutlet RMAnnotation *pathmyroute;
+@property (nonatomic, retain) IBOutlet UIButton *buttoncenter;
+@property (nonatomic, retain) IBOutlet UIButton *buttongeoloc;
+@property (nonatomic, retain) IBOutlet CLLocationManager *locationManager;
 
+- (IBAction)centerButton:(id)sender;
+- (IBAction)geolocButton:(id)sender;
 - (IBAction)doneButton:(id)sender;
 - (void)createRoute;
 + (void)drawRoute;
@@ -37,7 +44,7 @@
 - (void)createView:(CDVInvokedUrlCommand*)command;
 - (void)updateInfo;
 - (void)addMarkers:(double)lat :(double)lon :(NSString*)title :(NSString*)description :(NSString*)ido :(NSString*)icon;
--(UIImage *)imageResize :(UIImage*)img andResizeTo:(CGSize)newSize;
+- (UIImage *)imageResize :(UIImage*)img andResizeTo:(CGSize)newSize;
 
 @end
 
