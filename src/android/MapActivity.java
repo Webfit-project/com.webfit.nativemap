@@ -3,7 +3,6 @@ package com.webfit.nativemap;
 import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -36,7 +35,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.osmdroid.api.IMapController;
 import org.osmdroid.bonuspack.utils.BonusPackHelper;
-import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
+import org.osmdroid.tileprovider.MapTile;
+import org.osmdroid.tileprovider.tilesource.OnlineTileSourceBase;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.Marker;
@@ -52,8 +52,6 @@ import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
 
 /**
  * Created by Nicolas on 15/03/2017.
@@ -99,7 +97,15 @@ final public class MapActivity extends Activity implements View.OnClickListener,
     String tracking = intent.getStringExtra("tracking");
 
     mapView = (MapView) findViewById(R.id.map);
-    mapView.setTileSource(TileSourceFactory.MAPNIK);
+    //mapView.setTileSource(TileSourceFactory.MAPNIK);
+
+    String[] urlArray = {"https://server.arcgisonline.com/arcgis/rest/services/World_Topo_Map/MapServer/WMTS?layer=World_Topo_Map&style=default&tilematrixset=GoogleMapsCompatible&Service=WMTS&Request=GetTile&Version=1.0.0&Format=image%2Fjpeg"};
+    mapView.setTileSource(new OnlineTileSourceBase("ARCGisOnline", 0, 18, 256, "", urlArray) {
+      @Override
+      public String getTileURLString(MapTile aTile) {
+        return getBaseUrl() + "&TileMatrix="+aTile.getZoomLevel()+"&TileCol="+aTile.getX()+"&TileRow="+aTile.getY();
+      }
+    });
 
     IMapController mapController = mapView.getController();
     try {
@@ -114,15 +120,6 @@ final public class MapActivity extends Activity implements View.OnClickListener,
     int zoomLevel = Integer.parseInt(zoom);
     mapController.setZoom(zoomLevel);
 
-    /*
-    mRotationGestureOverlay = new RotationGestureOverlay(mapView);
-    mRotationGestureOverlay.setEnabled(true);
-
-
-
-    mapView.getOverlays().add(this.mLocationOverlay);
-
-    */
 
     mapView.setMaxZoomLevel(25);
 
@@ -215,12 +212,7 @@ final public class MapActivity extends Activity implements View.OnClickListener,
     this.addMyRoute(myroute);
     this.addRoute(route);
     this.addItem(iconList);
-
-
-
-
-
-
+    
   }
 
   public void waitingNewCoord() {
@@ -334,8 +326,7 @@ final public class MapActivity extends Activity implements View.OnClickListener,
     polyline.setWidth(10);
 
     mapView.getOverlays().add(polyline);
-
-
+    
   }
 
 
