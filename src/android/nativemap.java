@@ -6,6 +6,7 @@ import android.content.Intent;
 
 import android.content.pm.PackageManager;
 import android.os.Build;
+import android.os.Environment;
 import android.util.Log;
 
 import org.apache.cordova.CallbackContext;
@@ -137,9 +138,30 @@ public class nativemap extends CordovaPlugin {
 
         }
 
+        public long getOSMCacheDir()
+        {
+          String baseDir = Environment.getExternalStorageDirectory().getAbsolutePath();
+          String fileName = "osmdroid";
+          long size = 0;
+          File f = new File(baseDir + File.separator + fileName);
+          try {
+            for (File file : f.listFiles()) {
+              if (file != null && file.isDirectory()) {
+                size += getDirSize(file);
+              } else if (file != null && file.isFile()) {
+                size += file.length();
+              }
+            }
+          } catch(Exception e ) {}
+          return size;
+
+        }
+
+
         private long initializeCache(Context context) {
           long size = 0;
           size += getDirSize(context.getCacheDir());
+          size += this.getOSMCacheDir();
           size += getDirSize(context.getExternalCacheDir());
           return size;
         }
@@ -190,7 +212,22 @@ public class nativemap extends CordovaPlugin {
             deleteDir(dir);
           }
           catch(Exception e ){}
+          
+          deleteOSMDroid();
+
           return true;
+        }
+
+        public void deleteOSMDroid()
+        {
+          try {
+
+            String baseDir = Environment.getExternalStorageDirectory().getAbsolutePath();
+            String fileName = "osmdroid";
+            File f = new File(baseDir + File.separator + fileName);
+            deleteDir(f);
+          }
+          catch(Exception e ){}
         }
 
         public boolean deleteDir(File dir) {
