@@ -10,9 +10,9 @@ var nativemap = {
         exec(successCallback, failureCallback, 'nativemap', 'hasWES', []);
     },
 
-    startMap : function(center,iconList,route,myroute,zoom,btfollow,btcenter,tracking,successCallback, failureCallback) {
+    startMap : function(center,iconList,route,myroute,zoom,btfollow,btcenter,tracking,carto,successCallback, failureCallback) {
 
-        exec(successCallback, failureCallback, 'nativemap', 'startMap', [center,iconList,route,myroute,zoom,btfollow,btcenter,tracking]);
+        exec(successCallback, failureCallback, 'nativemap', 'startMap', [center,iconList,route,myroute,zoom,btfollow,btcenter,tracking,carto]);
     },
 
     getCacheSize: function(successCallback, failureCallback) {

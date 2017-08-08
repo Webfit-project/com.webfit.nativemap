@@ -9,6 +9,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
+import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
@@ -95,17 +96,27 @@ final public class MapActivity extends Activity implements View.OnClickListener,
     String btfollow = intent.getStringExtra("btfollow");
     String btcenter = intent.getStringExtra("btcenter");
     String tracking = intent.getStringExtra("tracking");
-
+    String carto = intent.getStringExtra("carto");
+   
     mapView = (MapView) findViewById(R.id.map);
     //mapView.setTileSource(TileSourceFactory.MAPNIK);
+    String[] urlArray = {""};
 
-    String[] urlArray = {"https://server.arcgisonline.com/arcgis/rest/services/World_Topo_Map/MapServer/WMTS?layer=World_Topo_Map&style=default&tilematrixset=GoogleMapsCompatible&Service=WMTS&Request=GetTile&Version=1.0.0&Format=image%2Fjpeg"};
+    org.osmdroid.config.Configuration.getInstance().setUserAgentValue("c2cmobileappwf");
+    if(carto.equals("ign")) {
+      urlArray[0] = "https://wxs.ign.fr/rx5kfym7dtkxnc4q3hnpcnwc/wmts?layer=GEOGRAPHICALGRIDSYSTEMS.MAPS&style=normal&tilematrixset=PM&Service=WMTS&Request=GetTile&Version=1.0.0&Format=image%2Fjpeg";
+    }  else {
+      urlArray[0] = "https://server.arcgisonline.com/arcgis/rest/services/World_Topo_Map/MapServer/WMTS?layer=World_Topo_Map&style=default&tilematrixset=GoogleMapsCompatible&Service=WMTS&Request=GetTile&Version=1.0.0&Format=image%2Fjpeg";
+     }
     mapView.setTileSource(new OnlineTileSourceBase("ARCGisOnline", 0, 18, 256, "", urlArray) {
       @Override
       public String getTileURLString(MapTile aTile) {
         return getBaseUrl() + "&TileMatrix="+aTile.getZoomLevel()+"&TileCol="+aTile.getX()+"&TileRow="+aTile.getY();
       }
     });
+
+
+
 
     IMapController mapController = mapView.getController();
     try {
@@ -212,7 +223,7 @@ final public class MapActivity extends Activity implements View.OnClickListener,
     this.addMyRoute(myroute);
     this.addRoute(route);
     this.addItem(iconList);
-    
+
   }
 
   public void waitingNewCoord() {
@@ -326,7 +337,7 @@ final public class MapActivity extends Activity implements View.OnClickListener,
     polyline.setWidth(10);
 
     mapView.getOverlays().add(polyline);
-    
+
   }
 
 
