@@ -12,6 +12,7 @@
 #import "RMShape.h"
 #import "RMCoordinateGridSource.h"
 #import "RMOpenCycleMapSource.h"
+#import "RMIGNMapSource.h"
 
 @implementation CDVNativeMap {
     CLLocationCoordinate2D center;
@@ -65,7 +66,7 @@
             
             double lat = [[routeList[n] valueForKey:@"lat"] doubleValue];
             double lon = [[routeList[n] valueForKey:@"lon"] doubleValue];
-            NSLog(@"on rajoute à la route les coordonnées: %@,%@",[routeList[n] valueForKey:@"lat"],[routeList[n] valueForKey:@"lon"]);
+           // NSLog(@"on rajoute à la route les coordonnées: %@,%@",[routeList[n] valueForKey:@"lat"],[routeList[n] valueForKey:@"lon"]);
             [routeCoord addObject:[[CLLocation alloc] initWithLatitude:lat longitude:lon]];
             
         }
@@ -81,7 +82,7 @@
             
             double lat = [[myrouteList[n] valueForKey:@"lat"] doubleValue];
             double lon = [[myrouteList[n] valueForKey:@"lon"] doubleValue];
-            NSLog(@"on rajoute les coordonnées: %@,%@",[myrouteList[n] valueForKey:@"lat"],[myrouteList[n] valueForKey:@"lon"]);
+           // NSLog(@"on rajoute les coordonnées: %@,%@",[myrouteList[n] valueForKey:@"lat"],[myrouteList[n] valueForKey:@"lon"]);
             [myrouteCoord addObject:[[CLLocation alloc] initWithLatitude:lat longitude:lon]];
             
         }
@@ -174,14 +175,21 @@
         [self.buttoncenter setImage:buttoncenterimg forState:UIControlStateNormal];
     }
     
- 
-    
-    
+    NSLog(@"param = %@",[command argumentAtIndex:8]);
+    if([[command argumentAtIndex:8] isEqualToString:@"ign"])
+    {
+        [mapView setTileSources:@[[[RMIGNMapSource alloc] init]]];
+    }
+    else {
     [mapView setTileSources:@[[[RMOESRIWorldTopoMap alloc] init]]];
-    [self.mapView setBackgroundColor:[UIColor greenColor]];
     
+    }
+  
     
+   //[mapView setTileSources:@[[[RMIGNMapSource alloc] init]]];
     
+     
+     [self.mapView setBackgroundColor:[UIColor greenColor]];
 				
     
     CGRect statusBarFrame = [self invertFrameIfNeeded:[UIApplication sharedApplication].statusBarFrame];
@@ -305,7 +313,7 @@
     
     for(int n = 0;n < [waypointList count];n++) {
         
-        NSLog(@"test iconlist objet n° %d: %@",n,waypointList[n] );
+       // NSLog(@"test iconlist objet n° %d: %@",n,waypointList[n] );
         double lat = [[waypointList[n] valueForKey:@"lat"] doubleValue];
         double lon = [[waypointList[n] valueForKey:@"lon"] doubleValue];
         NSString *title = [waypointList[n] valueForKey:@"title"];
@@ -350,7 +358,7 @@
 }
 - (void)addMarkers:(double)lat :(double)lon :(NSString*)title :(NSString*)description :(NSString *)ido :(NSString*)icon
 {
-    NSLog(@"on ajoute un marker");
+  //  NSLog(@"on ajoute un marker");
     
     
     UIImage *MarkerImage;
@@ -448,7 +456,7 @@
      [mapView addAnnotation:circleAnnotation];
      */
     
-    NSLog(@"fin ajout marker");
+ //   NSLog(@"fin ajout marker");
     
 }
 
@@ -543,7 +551,7 @@
     [ self.buttongeoloc removeFromSuperview];
 }
 - (void)createRoute:(NSDictionary *)iconList {
-    NSLog(@"on crée les annotations pour les routes");
+ //   NSLog(@"on crée les annotations pour les routes");
     
     
     
