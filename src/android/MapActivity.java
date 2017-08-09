@@ -97,18 +97,20 @@ final public class MapActivity extends Activity implements View.OnClickListener,
     String btcenter = intent.getStringExtra("btcenter");
     String tracking = intent.getStringExtra("tracking");
     String carto = intent.getStringExtra("carto");
-   
+
     mapView = (MapView) findViewById(R.id.map);
     //mapView.setTileSource(TileSourceFactory.MAPNIK);
     String[] urlArray = {""};
-
+    String sourceBase = "";
     org.osmdroid.config.Configuration.getInstance().setUserAgentValue("c2cmobileappwf");
     if(carto.equals("ign")) {
+      sourceBase = "ign";
       urlArray[0] = "https://wxs.ign.fr/rx5kfym7dtkxnc4q3hnpcnwc/wmts?layer=GEOGRAPHICALGRIDSYSTEMS.MAPS&style=normal&tilematrixset=PM&Service=WMTS&Request=GetTile&Version=1.0.0&Format=image%2Fjpeg";
     }  else {
+      sourceBase = "ARCGisOnline";
       urlArray[0] = "https://server.arcgisonline.com/arcgis/rest/services/World_Topo_Map/MapServer/WMTS?layer=World_Topo_Map&style=default&tilematrixset=GoogleMapsCompatible&Service=WMTS&Request=GetTile&Version=1.0.0&Format=image%2Fjpeg";
-     }
-    mapView.setTileSource(new OnlineTileSourceBase("ARCGisOnline", 0, 18, 256, "", urlArray) {
+    }
+    mapView.setTileSource(new OnlineTileSourceBase(sourceBase, 0, 18, 256, "", urlArray) {
       @Override
       public String getTileURLString(MapTile aTile) {
         return getBaseUrl() + "&TileMatrix="+aTile.getZoomLevel()+"&TileCol="+aTile.getX()+"&TileRow="+aTile.getY();
