@@ -58,9 +58,11 @@ public class nativemap extends CordovaPlugin {
       String[] permissions = {Manifest.permission.WRITE_EXTERNAL_STORAGE,Manifest.permission.READ_EXTERNAL_STORAGE};
       if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
         this.cordova.requestPermissions(this,WRITE_REQUEST_CODE,permissions);
-
-
-
+      }
+      else
+      {
+        result = new PluginResult(Status.OK);
+        this.cbContext.sendPluginResult(result);
       }
     }
     else if(action.equals("hasWES")) {
